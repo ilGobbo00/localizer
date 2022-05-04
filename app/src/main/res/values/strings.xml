@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Localizer</string>
+    <string name="developer">Riccardo Gobbo</string>
+    <string name="unipd_id">1224272</string>
+    <string name="unipd_email">riccardo.gobbo.2@studenti.unipd.it</string>
+    <string name="unipd_logo_description">UNIPD Logo</string>
+    <string name="history_tab">HISTORY</string>
+    <string name="graph_tab">GRAPH</string>
+    <string name="position_tab">POSITION</string>
+</resources>
