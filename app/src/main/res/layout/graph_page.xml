@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Graph"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/div_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ExtraText"
+        android:background="@drawable/background"
+        android:paddingTop="5sp"
+        android:paddingBottom="5sp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minHeight="?actionBarSize"
+            android:padding="10dp"
+            android:text="@string/app_name"
+            android:textSize="@dimen/app_title"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:flow_horizontalBias="0.9"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.01"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/unipd_logo"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/unipd_logo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@mipmap/unipd_logo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/unipd_email"
+            android:contentDescription="@string/unipd_logo_description" />
+
+        <TextView
+            android:id="@+id/developer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/developer"
+            android:textColor="@color/white"
+            android:textSize="@dimen/developer_info"
+            android:paddingLeft="5sp"
+            android:paddingRight="5sp"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="0.1"
+            app:layout_constraintBottom_toBottomOf="@id/unipd_logo"
+            app:layout_constraintLeft_toLeftOf="@id/unipd_email"
+
+            app:layout_constraintTop_toTopOf="@+id/unipd_logo"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/unipd_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unipd_id"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:paddingLeft="5sp"
+            android:paddingRight="5sp"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="0.1"
+            app:layout_constraintBottom_toBottomOf="@id/unipd_logo"
+            app:layout_constraintLeft_toLeftOf="@id/unipd_email"
+            app:layout_constraintTop_toBottomOf="@+id/developer"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/unipd_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unipd_email"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:paddingLeft="5sp"
+            android:paddingRight="5sp"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="0.1"
+            app:layout_constraintBottom_toBottomOf="@id/unipd_logo"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/unipd_id"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tab_menu"
+        app:layout_constraintTop_toBottomOf="@id/div_title"
+        android:background="#EAEAEA">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/position_button"
+            android:text="@string/position_tab"
+            android:textColor="@color/dark_green"
+            android:textStyle="bold"
+            android:padding="@dimen/tab_padding"
+            app:layout_constraintTop_toTopOf="@id/tab_menu"
+            app:layout_constraintBottom_toBottomOf="@id/tab_menu"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/history_button"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/history_button"
+            android:text="@string/history_tab"
+            android:textColor="@color/black"
+            android:padding="@dimen/tab_padding"
+            app:layout_constraintTop_toTopOf="@id/tab_menu"
+            app:layout_constraintBottom_toBottomOf="@id/tab_menu"
+            app:layout_constraintLeft_toRightOf="@id/position_button"
+            app:layout_constraintRight_toLeftOf="@id/graph_button"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/graph_button"
+            android:text="@string/graph_tab"
+            android:textColor="@color/black"
+            android:background="@drawable/selected_tab"
+            android:padding="@dimen/tab_padding"
+            app:layout_constraintTop_toTopOf="@id/tab_menu"
+            app:layout_constraintBottom_toBottomOf="@id/tab_menu"
+            app:layout_constraintLeft_toRightOf="@id/history_button"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

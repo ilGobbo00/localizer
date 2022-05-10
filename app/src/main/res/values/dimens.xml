@@ -3,4 +3,5 @@
     <dimen name="app_title">16sp</dimen>
     <dimen name="developer_info">12sp</dimen>
     <dimen name="tab_padding">10dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

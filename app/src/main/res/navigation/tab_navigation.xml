@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tab_navigation"
+    app:startDestination="@id/positionPage">
+
+<!-- From Position to History -->
+<!-- From Position to Graph -->
+    <fragment
+        android:id="@+id/positionPage"
+        android:name="com.unipd.localizer.Position"
+        android:label="position_page"
+        tools:layout="@layout/position_page">
+        <action
+            android:id="@+id/action_positionPage_to_historyPage"
+            app:destination="@id/historyPage"
+            app:popUpTo="@id/historyPage"/>
+        <action
+            android:id="@+id/action_positionPage_to_graphPage"
+            app:destination="@id/graphPage"
+            app:popUpTo="@id/graphPage"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/historyPage"
+        android:name="com.unipd.localizer.History"
+        android:label="history_page"
+        tools:layout="@layout/history_page">
+        <action
+            android:id="@+id/action_historyPage_to_positionPage"
+            app:destination="@id/positionPage"
+            app:popUpTo="@id/positionPage"/>
+        <action
+            android:id="@+id/action_historyPage_to_graphPage"
+            app:destination="@id/graphPage"
+            app:popUpTo="@id/graphPage"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/graphPage"
+        android:name="com.unipd.localizer.Graph"
+        android:label="history_page"
+        tools:layout="@layout/graph_page">
+        <action
+            android:id="@+id/action_graphPage_to_positionPage"
+            app:destination="@id/positionPage"
+            app:popUpTo="@id/positionPage"/>
+        <action
+            android:id="@+id/action_graphPage_to_historyPage"
+            app:destination="@id/historyPage"
+            app:popUpTo="@id/historyPage"/>
+    </fragment>
+
+</navigation>
