@@ -4,7 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/drawable/background.xml" value="0.1" />
-        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/drawable/selected_tab.xml" value="0.2475" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/activity_main.xml" value="0.41574074074074074" />
       </map>
     </option>
   </component>
