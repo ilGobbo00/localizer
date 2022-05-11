@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="app_title">16sp</dimen>
+    <dimen name="app_title">20sp</dimen>
     <dimen name="developer_info">12sp</dimen>
-    <dimen name="tab_padding">10dp</dimen>
+    <dimen name="tab_padding">12dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="position_details">15dp</dimen>
+    <dimen name="current_position_padding">20dp</dimen>
+    <dimen name="label_padding">5dp</dimen>
+    <dimen name="current_position_title">20sp</dimen>
+    <dimen name="label_position_details">15sp</dimen>
+    <dimen name="label_dimension"> 100dp</dimen>
 </resources>
