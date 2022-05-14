@@ -17,4 +17,5 @@
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>
     <string name="invalid_home_data">Invalid data</string>
+    <string name="invalid_position_label">None</string>
 </resources>

@@ -2,10 +2,7 @@ package com.unipd.localizer
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.pm.PackageManager
 import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,14 +10,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.room.Room
 import com.google.android.gms.location.*
+import kotlinx.coroutines.launch
+import kotlin.math.ceil
 
 
 class Position : Fragment() {
+    // Database variables/values
+    lateinit var database: LocationsDatabase
+    private lateinit var referenceLocationRepo: ReferenceLocationRepo
 
+    // Navigation buttons
     private lateinit var  historyButton: TextView
     private lateinit var  graphButton: TextView
 
@@ -28,19 +33,34 @@ class Position : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: Location? = null
 
+//    override fun onAttach(context: Context) {
+//        Log.d("Execution", "Position fragment attached")
+//        database = Room.databaseBuilder(context, LocationsDatabase::class.java, "locations").build()
+//        super.onAttach(context)
+//    }
+
     companion object{
         const val OLDEST_DATA = 1000 * 60 * 5                                       // Oldest Position 5min old
         const val REFRESH_TIME = 1000                                               // Read position every 1s
-        val MAX_LIST_SIZE =
-            Math.ceil((OLDEST_DATA / REFRESH_TIME).toDouble())           // Max queue size
+        val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())           // Max queue size
     }
 
+//    override fun onAttach(context: Context) {
+//        super.onAttach(context)
+//        if (context is Activity) {
+//            mActivity = context as FragmentActivity?
+//        }
+//    }
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //return super.onCreateView(inflater, container, savedInstanceState)
         //super.onCreate(savedInstanceState)
+        // Database management
+        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
+
         val view = inflater.inflate(R.layout.position_page, container, false)
-        var permissionObtained: Boolean = false
+        var permissionObtained = false
         //view.setContentView(R.layout.position_page)
 
         historyButton = view.findViewById(R.id.history_button)
@@ -71,24 +91,15 @@ class Position : Fragment() {
         val latitudeField: TextView = view.findViewById(R.id.latitude_field)
         val longitudeField: TextView = view.findViewById(R.id.longitude_field)
 
-        Log.d("Runtime", "Before locationPermissionRequest")
+        Log.d("Execution", "Before locationPermissionRequest")
         val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             run {
-//                Log.d("Check permissions", "checking..")
-//                var tempPerms = true
                 permissionObtained = true
                 for (permission in permissions) {
-                    Log.d("Check permission", permission.toString())
+                    Log.d("Permissions", "Checking: $permission")
                     permissionObtained = permissionObtained && permission.value
                 }
-//
-//
                 Log.d("Permissions", "Checking permissions..")
-//                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//                    ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    Log.d("Permissions", "Missing permissions. Require permission to user")
-//                    ActivityCompat.requestPermissions(requireContext() as Activity,arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 0)
-//                }else{
                   if(permissionObtained){
                       Log.d("Permissions", "Permission obtained")
                       val locationRequest: LocationRequest = LocationRequest.create()
@@ -102,11 +113,40 @@ class Position : Fragment() {
                                 // Called when device location information is available.
                                 override fun onLocationResult(locationResult : LocationResult){
                                     currentLocation = locationResult.lastLocation
-
                                     latitudeField.text = currentLocation?.latitude.toString()             // Display data if a location is available
                                     longitudeField.text = currentLocation?.longitude.toString()
-                                    Log.d("Data read", "lat: ${currentLocation?.latitude.toString()} - long: ${currentLocation?.longitude.toString()}")
+                                    Log.d("Data read", "time: ${currentLocation?.time} - lat: ${currentLocation?.latitude.toString()} - long: ${currentLocation?.longitude.toString()}")
 
+                                    // If there are too much elements, delete all data
+                                    referenceLocationRepo.allLocations.observe(
+                                        requireActivity()
+                                    ) { locations ->
+                                        if (locations != null && locations.size >= MAX_SIZE) {
+                                            Log.d("Execution", "Deleting old data")
+                                            referenceLocationRepo.deleteOld()
+                                        }
+
+                                    }
+
+                                    // Insert an entry with valid currentLocation
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        Log.d("Execution", "CoroutineScope")
+                                        // If there are too much elements, delete all data
+//                                        if(referenceLocationRepo.allLocations.value?.size!! >= MAX_SIZE) {
+//                                            Log.d("Execution", "Deleting old locations")
+//                                            referenceLocationRepo.deleteOld()
+//                                        }
+//                                        if(database.locationDao().getAllLocations().value?.size!! >= MAX_SIZE)
+//                                            database.locationDao().deleteOld()
+
+                                        if(currentLocation != null){
+                                            Log.d("Execution", "Saving new location")
+                                            val entry = LocationEntity(currentLocation!!.time, currentLocation)
+                                            referenceLocationRepo.insert(entry)
+//                                            database.locationDao().insertLocation(entry)
+                                        }
+//                                        currentLocation?.let{database.locationDao().insertLocation(currentLocation!!.time,currentLocation!!)}
+                                    }
                                     super.onLocationResult(locationResult)
                                 }
                             },
@@ -115,7 +155,7 @@ class Position : Fragment() {
                 }
             }
         }
-        Log.d("Runtime", "After locationPermissionRequest: $locationPermissionRequest")
+        Log.d("Execution", "After locationPermissionRequest: $locationPermissionRequest")
         if(!permissionObtained) {
             Log.d("Permissions", "Asking permissions")
             locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
