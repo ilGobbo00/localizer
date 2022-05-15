@@ -117,6 +117,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/tab_padding"
             android:text="@string/position_tab"
+            android:textAllCaps="true"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/tab_menu"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -129,6 +130,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/tab_padding"
             android:text="@string/history_tab"
+            android:textAllCaps="true"
             android:textColor="@color/dark_green"
             android:textStyle="bold"
             android:background="@drawable/selected_tab"
@@ -143,6 +145,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/tab_padding"
             android:text="@string/graph_tab"
+            android:textAllCaps="true"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/tab_menu"
             app:layout_constraintLeft_toRightOf="@id/history_button"
@@ -162,6 +165,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

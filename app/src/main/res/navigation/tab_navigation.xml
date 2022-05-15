@@ -36,6 +36,9 @@
             android:id="@+id/action_historyPage_to_graphPage"
             app:destination="@id/graphPage"
             app:popUpTo="@id/graphPage"/>
+        <action
+            android:id="@+id/action_historyPage_to_detailPage"
+            app:destination="@id/locationDetail"/>
     </fragment>
 
     <fragment
@@ -51,6 +54,20 @@
             android:id="@+id/action_graphPage_to_historyPage"
             app:destination="@id/historyPage"
             app:popUpTo="@id/historyPage"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/locationDetail"
+        android:name="com.unipd.localizer.Details"
+        android:label="details_page"
+        tools:layout="@layout/location_detail">
+        <action
+            android:id="@+id/action_detailPage_to_historyPage"
+            app:destination="@id/historyPage"
+            app:popUpTo="@id/historyPage"/>
+        <argument
+            android:name="location"
+            app:argType="string"/>
     </fragment>
 
 </navigation>

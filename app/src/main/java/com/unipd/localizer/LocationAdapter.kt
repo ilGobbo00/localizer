@@ -1,13 +1,14 @@
 package com.unipd.localizer
 
-import android.location.Location
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import java.sql.Timestamp
 
-class LocationAdapter(private val positionsList: List<Location>, private val database: LocationsDatabase) :
+class LocationAdapter(private val locationList: List<LocationEntity>) :
 RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
 
     class LocationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -17,12 +18,10 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
             locationLabel.text = word
         }
     }
-
     private val onClickListener = View.OnClickListener { view ->
-        val location = view.findViewById<TextView>(R.id.location_label).text.toString()
-        // TODO - Da implementare la navigazione (crezione di altro xml e classe fragment)
-//        val action = HistoryDirections.actionListFragmentToDetailFragment(location)
-//        Navigation.findNavController(view).navigate(action)
+        val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()    // Get human readable time
+        val seeDetails = HistoryDirections.actionHistoryPageToDetailPage(locationDateTime)          // TODO Trovare il metodo di passare un oggetto di tipo LocationEntity
+        Navigation.findNavController(view).navigate(seeDetails)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationViewHolder {
@@ -33,11 +32,15 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
 
     // Returns size of data list
     override fun getItemCount(): Int {
-        return positionsList.size
+        return locationList.size
     }
 
     // Displays data at a certain position
     override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
-        holder.bind(database.locationDao().getAllLocationsStringTimestamp()[position])
+        val locationStringList = mutableListOf<String>()
+        for(location in locationList)
+            locationStringList.add(Timestamp(location.timeStamp).toString())      // TODO provare dd-mm-yyyy hh-mm-ss
+//        val locationList = locationDao.getAllLocationsStringTimestamp()         // TODO Probabilmente crasha
+        holder.bind(locationStringList[position])
     }
 }

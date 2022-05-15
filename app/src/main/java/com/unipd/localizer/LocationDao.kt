@@ -34,10 +34,10 @@ interface LocationDao {
                 val locationList = getAllLocations()
                 val strList = mutableListOf<String>()
 
-                // TODO - Sicuramente crasha quando cerca di fare locationList.value
-                for(location in locationList.value!!){
+                // TODO - Sicuramente crasha quando cerca di fare locationList.value, Da provare
+                for(location in locationList.value!!)
                         strList.add(location.timeStamp.toString())    // Only a no null location is stored
-                }
+
                 return strList
         }
 

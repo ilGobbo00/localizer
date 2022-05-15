@@ -117,6 +117,7 @@
             android:background="@drawable/selected_tab"
             android:padding="@dimen/tab_padding"
             android:text="@string/position_tab"
+            android:textAllCaps="true"
             android:textColor="@color/dark_green"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tab_menu"
@@ -130,6 +131,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/tab_padding"
             android:text="@string/history_tab"
+            android:textAllCaps="true"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/tab_menu"
             app:layout_constraintLeft_toRightOf="@id/position_button"
@@ -142,6 +144,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/tab_padding"
             android:text="@string/graph_tab"
+            android:textAllCaps="true"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/tab_menu"
             app:layout_constraintLeft_toRightOf="@id/history_button"
@@ -191,6 +194,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/position_main_label"
+            android:textAllCaps="true"
             android:textColor="@color/black"
             android:textSize="@dimen/current_position_title"
             app:layout_constraintTop_toTopOf="parent"
@@ -226,6 +230,8 @@
             app:layout_constraintBottom_toTopOf="@id/guideline_map"
             app:layout_constraintLeft_toLeftOf="@id/guideline_location_labels"
             />
+
+
 
         <!--    Latitude field -->
         <TextView

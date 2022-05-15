@@ -4,18 +4,23 @@
     <string name="unipd_id">1224272</string>
     <string name="unipd_email">riccardo.gobbo.2@studenti.unipd.it</string>
     <string name="unipd_logo_description">UNIPD Logo</string>
-    <string name="history_tab">HISTORY</string>
-    <string name="graph_tab">GRAPH</string>
-    <string name="position_tab">POSITION</string>
+    <string name="history_tab">history</string>
+    <string name="graph_tab">graph</string>
+    <string name="position_tab">position</string>
     <string name="title_activity_main">MainActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="position_main_label">CURRENT POSITION</string>
+    <string name="position_main_label">current position</string>
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>
     <string name="invalid_home_data">Invalid data</string>
     <string name="invalid_position_label">None</string>
+    <string name="location_details_title">location details</string>
+    <string name="time_location_detail">Data obtained on: %1$s</string>
+    <string name="latitude_read_detail">Latitude read: %1$l</string>
+    <string name="longitude_read_detail">Longitude read: %1$l</string>
+    <string name="back_button_desctiption">back_to_location_list</string>
 </resources>

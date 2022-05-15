@@ -22,7 +22,7 @@ import kotlin.math.ceil
 
 class Position : Fragment() {
     // Database variables/values
-    lateinit var database: LocationsDatabase
+//    lateinit var database: LocationsDatabase
     private lateinit var referenceLocationRepo: ReferenceLocationRepo
 
     // Navigation buttons
@@ -32,8 +32,8 @@ class Position : Fragment() {
     // Variable for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: SimpleLocationItem? = null
-    lateinit var latitudeField: TextView
-    lateinit var longitudeField: TextView
+    var latitudeField: TextView? = null
+    var longitudeField: TextView? = null
 
 //    override fun onAttach(context: Context) {
 //        Log.d("Execution", "Position fragment attached")
@@ -42,7 +42,7 @@ class Position : Fragment() {
 //    }
 
     companion object{
-        const val OLDEST_DATA = 1000 /** 60*/ * 5           //TODO tenere i 60                            // Oldest Position 5min old (millis)
+        const val OLDEST_DATA = 1000 /** 60*/ * 15           //TODO tenere i 60 * 5                           // Oldest Position 5min old (millis)
         const val REFRESH_TIME = 1000                                               // Read position every 1s
         val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())                // Max queue size
     }
@@ -58,7 +58,7 @@ class Position : Fragment() {
         //return super.onCreateView(inflater, container, savedInstanceState)
         //super.onCreate(savedInstanceState)
         // Database management
-        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+//        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
         referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
 
         val view = inflater.inflate(R.layout.position_page, container, false)
@@ -94,8 +94,8 @@ class Position : Fragment() {
         longitudeField = view.findViewById(R.id.longitude_field)
 
         if(savedInstanceState != null){
-            latitudeField.text = savedInstanceState.getString("latitude")
-            longitudeField.text = savedInstanceState.getString("longitude")
+            latitudeField?.text = savedInstanceState.getString("latitude")
+            longitudeField?.text = savedInstanceState.getString("longitude")
         }
 
         // Wait until there are some data. If there are too much elements, delete all data older than OLDEST_DATA
@@ -135,8 +135,8 @@ class Position : Fragment() {
                                 override fun onLocationResult(locationResult : LocationResult){
                                     val lastLocation = locationResult.lastLocation
                                     currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude/*, lastLocation.time*/)
-                                    latitudeField.text = currentLocation?.latitude.toString()             // Display data if a location is available
-                                    longitudeField.text = currentLocation?.longitude.toString()
+                                    latitudeField?.text = currentLocation?.latitude.toString()             // Display data if a location is available
+                                    longitudeField?.text = currentLocation?.longitude.toString()
                                     Log.d("Data read", "time: ${lastLocation.time} - lat: ${currentLocation?.latitude.toString()} - long: ${currentLocation?.longitude.toString()}")
 
                                     // If there are too much elements, delete all data
@@ -191,8 +191,8 @@ class Position : Fragment() {
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle){
-        savedInstanceState.putString("latitude", latitudeField.text.toString())
-        savedInstanceState.putString("longitude", longitudeField.text.toString())
+        savedInstanceState.putString("latitude", latitudeField?.text.toString())
+        savedInstanceState.putString("longitude", longitudeField?.text.toString())
         super.onSaveInstanceState(savedInstanceState)
     }
 
