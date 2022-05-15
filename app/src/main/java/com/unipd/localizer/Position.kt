@@ -2,7 +2,7 @@ package com.unipd.localizer
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.location.Location
+//import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,7 +31,9 @@ class Position : Fragment() {
 
     // Variable for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var currentLocation: Location? = null
+    private var currentLocation: SimpleLocationItem? = null
+    lateinit var latitudeField: TextView
+    lateinit var longitudeField: TextView
 
 //    override fun onAttach(context: Context) {
 //        Log.d("Execution", "Position fragment attached")
@@ -40,9 +42,9 @@ class Position : Fragment() {
 //    }
 
     companion object{
-        const val OLDEST_DATA = 1000 * 60 * 5                                       // Oldest Position 5min old
+        const val OLDEST_DATA = 1000 /** 60*/ * 5           //TODO tenere i 60                            // Oldest Position 5min old (millis)
         const val REFRESH_TIME = 1000                                               // Read position every 1s
-        val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())           // Max queue size
+        val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())                // Max queue size
     }
 
 //    override fun onAttach(context: Context) {
@@ -88,8 +90,27 @@ class Position : Fragment() {
             return view
         }
 
-        val latitudeField: TextView = view.findViewById(R.id.latitude_field)
-        val longitudeField: TextView = view.findViewById(R.id.longitude_field)
+        latitudeField = view.findViewById(R.id.latitude_field)
+        longitudeField = view.findViewById(R.id.longitude_field)
+
+        if(savedInstanceState != null){
+            latitudeField.text = savedInstanceState.getString("latitude")
+            longitudeField.text = savedInstanceState.getString("longitude")
+        }
+
+        // Wait until there are some data. If there are too much elements, delete all data older than OLDEST_DATA
+        referenceLocationRepo.allLocations.observe(
+            requireActivity()
+        ) { locations ->
+            if (locations != null && locations.size >= MAX_SIZE) {
+                Log.d("Execution", "Current ${locations.size} locations stored: $locations")
+                Log.d("Execution", "First element: ${locations[0].location}")
+                Log.d("Execution", "Before deleting old data")
+                referenceLocationRepo.deleteOld()
+                Log.d("Execution", "After deletig old data: ${referenceLocationRepo.allLocations.value}")
+            }
+
+        }
 
         Log.d("Execution", "Before locationPermissionRequest")
         val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -112,40 +133,45 @@ class Position : Fragment() {
                             object : LocationCallback() {
                                 // Called when device location information is available.
                                 override fun onLocationResult(locationResult : LocationResult){
-                                    currentLocation = locationResult.lastLocation
+                                    val lastLocation = locationResult.lastLocation
+                                    currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude/*, lastLocation.time*/)
                                     latitudeField.text = currentLocation?.latitude.toString()             // Display data if a location is available
                                     longitudeField.text = currentLocation?.longitude.toString()
-                                    Log.d("Data read", "time: ${currentLocation?.time} - lat: ${currentLocation?.latitude.toString()} - long: ${currentLocation?.longitude.toString()}")
+                                    Log.d("Data read", "time: ${lastLocation.time} - lat: ${currentLocation?.latitude.toString()} - long: ${currentLocation?.longitude.toString()}")
 
                                     // If there are too much elements, delete all data
-                                    referenceLocationRepo.allLocations.observe(
+                                    /* referenceLocationRepo.allLocations.observe(
                                         requireActivity()
                                     ) { locations ->
                                         if (locations != null && locations.size >= MAX_SIZE) {
+                                            Log.d("Execution", "Current ${locations.size} locations stored: $locations")
                                             Log.d("Execution", "Deleting old data")
                                             referenceLocationRepo.deleteOld()
                                         }
 
-                                    }
+                                    }*/
 
-                                    // Insert an entry with valid currentLocation
-                                    viewLifecycleOwner.lifecycleScope.launch {
-                                        Log.d("Execution", "CoroutineScope")
-                                        // If there are too much elements, delete all data
-//                                        if(referenceLocationRepo.allLocations.value?.size!! >= MAX_SIZE) {
-//                                            Log.d("Execution", "Deleting old locations")
-//                                            referenceLocationRepo.deleteOld()
-//                                        }
-//                                        if(database.locationDao().getAllLocations().value?.size!! >= MAX_SIZE)
-//                                            database.locationDao().deleteOld()
+                                    // To avoid app crashing, check control not null
+                                    getView()?.let{
+                                        // Insert an entry with valid currentLocation
+                                        viewLifecycleOwner.lifecycleScope.launch {
+                                            Log.d("Execution", "CoroutineScope")
+                                            // If there are too much elements, delete all data
+                                            /*if(referenceLocationRepo.allLocations.value?.size!! >= MAX_SIZE) {
+                                                Log.d("Execution", "Deleting old locations")
+                                                referenceLocationRepo.deleteOld()
+                                            }
+                                            if(database.locationDao().getAllLocations().value?.size!! >= MAX_SIZE)
+                                                database.locationDao().deleteOld()*/
 
-                                        if(currentLocation != null){
-                                            Log.d("Execution", "Saving new location")
-                                            val entry = LocationEntity(currentLocation!!.time, currentLocation)
-                                            referenceLocationRepo.insert(entry)
-//                                            database.locationDao().insertLocation(entry)
+                                            if(currentLocation != null){
+                                                val entry = LocationEntity(lastLocation.time, currentLocation)
+                                                Log.d("Execution", "Saving new location with timestamp: ${entry.timeStamp} and location: ${entry.location}")
+                                                referenceLocationRepo.insert(entry)
+    //                                            database.locationDao().insertLocation(entry)
+                                            }
+    //                                        currentLocation?.let{database.locationDao().insertLocation(currentLocation!!.time,currentLocation!!)}
                                         }
-//                                        currentLocation?.let{database.locationDao().insertLocation(currentLocation!!.time,currentLocation!!)}
                                     }
                                     super.onLocationResult(locationResult)
                                 }
@@ -161,8 +187,13 @@ class Position : Fragment() {
             locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
         }else
             Log.d("Permissions", "Permissions already got")
-
         return view
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle){
+        savedInstanceState.putString("latitude", latitudeField.text.toString())
+        savedInstanceState.putString("longitude", longitudeField.text.toString())
+        super.onSaveInstanceState(savedInstanceState)
     }
 
 }

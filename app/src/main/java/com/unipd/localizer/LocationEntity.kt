@@ -1,6 +1,5 @@
 package com.unipd.localizer
 
-import android.location.Location
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,7 +9,7 @@ import java.util.*
 @Entity (tableName = "locations")
 data class LocationEntity(
     @PrimaryKey(autoGenerate = false) val timeStamp: Long,
-    val location: Location?
+    val location: SimpleLocationItem?
 )
 //{
 //    @Ignore
