@@ -23,4 +23,6 @@
     <string name="latitude_read_detail">Latitude read: %1$l</string>
     <string name="longitude_read_detail">Longitude read: %1$l</string>
     <string name="back_button_desctiption">back_to_location_list</string>
+    <string name="altitude_label">Altitude</string>
+    <string name="altitude_read_detail">Altitude read: %1$l</string>
 </resources>

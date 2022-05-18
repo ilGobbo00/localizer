@@ -16,6 +16,12 @@ interface LocationDao {
         @Query("SELECT * FROM locations ORDER BY timeStamp DESC")
         fun getAllLocations(): LiveData<List<LocationEntity>>
 
+//        @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
+//        fun getLocation(timestamp: Long): LiveData<LocationEntity>
+
+        @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
+        fun getLocation(timestamp: Long): LocationEntity
+
         @Query("DELETE FROM locations")
         fun deleteAll()
 

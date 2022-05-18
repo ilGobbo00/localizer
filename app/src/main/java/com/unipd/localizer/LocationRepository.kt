@@ -12,6 +12,15 @@ class LocationRepository(private val locationDao: LocationDao) {
         locationDao.insertLocation(location)
     }
 
+//    @WorkerThread
+//    suspend fun getLocation(timestamp: Long): LiveData<LocationEntity> {
+//        return locationDao.getLocation(timestamp)
+//    }
+    @WorkerThread
+    suspend fun getLocation(timestamp: Long): LocationEntity {
+        return locationDao.getLocation(timestamp)
+    }
+
     @WorkerThread
     suspend fun deleteOld(){
         locationDao.deleteOld()

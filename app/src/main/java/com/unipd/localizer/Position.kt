@@ -34,6 +34,7 @@ class Position : Fragment() {
     private var currentLocation: SimpleLocationItem? = null
     var latitudeField: TextView? = null
     var longitudeField: TextView? = null
+    var altitudeField: TextView? = null
 
 //    override fun onAttach(context: Context) {
 //        Log.d("Execution", "Position fragment attached")
@@ -92,10 +93,12 @@ class Position : Fragment() {
 
         latitudeField = view.findViewById(R.id.latitude_field)
         longitudeField = view.findViewById(R.id.longitude_field)
+        altitudeField = view.findViewById(R.id.altitude_field)
 
         if(savedInstanceState != null){
             latitudeField?.text = savedInstanceState.getString("latitude")
             longitudeField?.text = savedInstanceState.getString("longitude")
+            altitudeField?.text = savedInstanceState.getString("altitude")
         }
 
         // Wait until there are some data. If there are too much elements, delete all data older than OLDEST_DATA
@@ -134,10 +137,14 @@ class Position : Fragment() {
                                 // Called when device location information is available.
                                 override fun onLocationResult(locationResult : LocationResult){
                                     val lastLocation = locationResult.lastLocation
-                                    currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude/*, lastLocation.time*/)
+                                    currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude, lastLocation.altitude/*, lastLocation.time*/)
                                     latitudeField?.text = currentLocation?.latitude.toString()             // Display data if a location is available
                                     longitudeField?.text = currentLocation?.longitude.toString()
-                                    Log.d("Data read", "time: ${lastLocation.time} - lat: ${currentLocation?.latitude.toString()} - long: ${currentLocation?.longitude.toString()}")
+                                    altitudeField?.text = currentLocation?.altitude.toString()
+                                    Log.d("Data read", "time: ${lastLocation.time} " +
+                                            "- lat: ${currentLocation?.latitude.toString()} " +
+                                            "- long: ${currentLocation?.longitude.toString()} " +
+                                            "- alt: ${currentLocation?.altitude.toString()}")
 
                                     // If there are too much elements, delete all data
                                     /* referenceLocationRepo.allLocations.observe(
@@ -193,6 +200,7 @@ class Position : Fragment() {
     override fun onSaveInstanceState(savedInstanceState: Bundle){
         savedInstanceState.putString("latitude", latitudeField?.text.toString())
         savedInstanceState.putString("longitude", longitudeField?.text.toString())
+        savedInstanceState.putString("altitude", altitudeField?.text.toString())
         super.onSaveInstanceState(savedInstanceState)
     }
 

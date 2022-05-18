@@ -4,9 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import kotlin.coroutines.coroutineContext
 
 class LocationAdapter(private val locationList: List<LocationEntity>) :
 RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
@@ -39,7 +42,7 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
     override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
         val locationStringList = mutableListOf<String>()
         for(location in locationList)
-            locationStringList.add(Timestamp(location.timeStamp).toString())      // TODO provare dd-mm-yyyy hh-mm-ss
+            locationStringList.add(SimpleDateFormat("dd-MM-yyyy kk:mm:ss.SSS").format(location.timeStamp)/*Timestamp(location.timeStamp).toString()*/)      // TODO provare dd-mm-yyyy hh-mm-ss
 //        val locationList = locationDao.getAllLocationsStringTimestamp()         // TODO Probabilmente crasha
         holder.bind(locationStringList[position])
     }
