@@ -31,9 +31,17 @@ class ReferenceLocationRepo(application: Application): AndroidViewModel(applicat
 //        lastRequestedLocation = repo.getLocation(timestamp)
 //    }
 
-    suspend fun getLocation(timestamp: Long): LocationEntity{
-        Log.d("CoExecution", "Time to find: $timestamp")
+    suspend fun getAllLocations(): List<LocationEntity>? {
+        return repo.getAllLocations()
+    }
+
+    suspend fun getLocation(timestamp: Long): LocationEntity? {
+//        Log.d("CoExecution", "Time to find: $timestamp")
         return repo.getLocation(timestamp)
+    }
+
+    suspend fun getOldestLocation(): Long?{
+        return repo.getOldestLocation()
     }
 
     fun deleteOld() = viewModelScope.launch(Dispatchers.IO){

@@ -9,8 +9,9 @@
     <dimen name="label_padding">5dp</dimen>
     <dimen name="current_position_title">20sp</dimen>
     <dimen name="label_position_details">15sp</dimen>
-    <dimen name="label_dimension"> 150dp</dimen>
+    <dimen name="detail_label_dimension"> 160dp</dimen>
     <dimen name="detail_title_margin">40dp</dimen>
     <dimen name="detail_title_size">25sp</dimen>
     <dimen name="saving_time">20sp</dimen>
+    <dimen name="recycleviwe_margin">30dp</dimen>
 </resources>

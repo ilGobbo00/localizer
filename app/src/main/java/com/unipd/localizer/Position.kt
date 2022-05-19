@@ -16,7 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.room.Room
 import com.google.android.gms.location.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.math.ceil
 
 
@@ -36,6 +38,8 @@ class Position : Fragment() {
     var longitudeField: TextView? = null
     var altitudeField: TextView? = null
 
+//    var checkForDelete = true
+
 //    override fun onAttach(context: Context) {
 //        Log.d("Execution", "Position fragment attached")
 //        database = Room.databaseBuilder(context, LocationsDatabase::class.java, "locations").build()
@@ -43,7 +47,7 @@ class Position : Fragment() {
 //    }
 
     companion object{
-        const val OLDEST_DATA = 1000 /** 60*/ * 15           //TODO tenere i 60 * 5                           // Oldest Position 5min old (millis)
+        const val OLDEST_DATA = 1000 * 60 * 5                                       // Oldest Position: 5min old (millis)(considering 1 location/s)
         const val REFRESH_TIME = 1000                                               // Read position every 1s
         val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())                // Max queue size
     }
@@ -106,11 +110,11 @@ class Position : Fragment() {
             requireActivity()
         ) { locations ->
             if (locations != null && locations.size >= MAX_SIZE) {
-                Log.d("Execution", "Current ${locations.size} locations stored: $locations")
-                Log.d("Execution", "First element: ${locations[0].location}")
+//                Log.d("Execution", "Current ${locations.size} locations stored: $locations")
+//                Log.d("Execution", "First element: ${locations[0].location}")
                 Log.d("Execution", "Before deleting old data")
                 referenceLocationRepo.deleteOld()
-                Log.d("Execution", "After deletig old data: ${referenceLocationRepo.allLocations.value}")
+                Log.d("Execution", "Current ${referenceLocationRepo.allLocations.value?.size} data: ${referenceLocationRepo.allLocations.value}")
             }
 
         }
@@ -159,9 +163,9 @@ class Position : Fragment() {
                                     }*/
 
                                     // To avoid app crashing, check control not null
-                                    getView()?.let{
+//                                    getView()?.let{
                                         // Insert an entry with valid currentLocation
-                                        viewLifecycleOwner.lifecycleScope.launch {
+                                        activity?.lifecycleScope?.launch {
                                             Log.d("Execution", "CoroutineScope")
                                             // If there are too much elements, delete all data
                                             /*if(referenceLocationRepo.allLocations.value?.size!! >= MAX_SIZE) {
@@ -171,15 +175,14 @@ class Position : Fragment() {
                                             if(database.locationDao().getAllLocations().value?.size!! >= MAX_SIZE)
                                                 database.locationDao().deleteOld()*/
 
-                                            if(currentLocation != null){
+                                                // Then insert new valid position
                                                 val entry = LocationEntity(lastLocation.time, currentLocation)
                                                 Log.d("Execution", "Saving new location with timestamp: ${entry.timeStamp} and location: ${entry.location}")
                                                 referenceLocationRepo.insert(entry)
-    //                                            database.locationDao().insertLocation(entry)
-                                            }
-    //                                        currentLocation?.let{database.locationDao().insertLocation(currentLocation!!.time,currentLocation!!)}
+//                                                checkForDelete = true
+//                                            }
                                         }
-                                    }
+//                                    }
                                     super.onLocationResult(locationResult)
                                 }
                             },

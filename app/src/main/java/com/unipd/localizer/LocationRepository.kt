@@ -16,9 +16,20 @@ class LocationRepository(private val locationDao: LocationDao) {
 //    suspend fun getLocation(timestamp: Long): LiveData<LocationEntity> {
 //        return locationDao.getLocation(timestamp)
 //    }
+
     @WorkerThread
-    suspend fun getLocation(timestamp: Long): LocationEntity {
+    suspend fun getAllLocations(): List<LocationEntity>? {
+        return locationDao.getAllLocations().value          // TODO Vedere se si spacca
+    }
+
+    @WorkerThread
+    suspend fun getLocation(timestamp: Long): LocationEntity? {
         return locationDao.getLocation(timestamp)
+    }
+
+    @WorkerThread
+    suspend fun getOldestLocation(): Long? {
+        return locationDao.getOldestTimeSaved()
     }
 
     @WorkerThread

@@ -10,10 +10,10 @@ import java.io.ByteArrayOutputStream
 class Converters {
     @TypeConverter
     fun fromLocation(location: SimpleLocationItem?): String?{
-        Log.d("Room", "Location before conversion: $location")
-        val storable = Gson().toJson(location)
-        Log.d("Room", "Location after conversion: $storable")
-        return storable
+//        Log.d("Room", "Location before conversion: $location")
+//        val storable = Gson().toJson(location)
+//        Log.d("Room", "Location after conversion: $storable")
+        return Gson().toJson(location)
     }
 
     @TypeConverter

@@ -18,11 +18,13 @@
     <string name="longitude_label">Longitude</string>
     <string name="invalid_home_data">Invalid data</string>
     <string name="invalid_position_label">None</string>
+    <string name="invalid_location_detail">Unable to get location read on: %1$s at %2$s</string>
     <string name="location_details_title">location details</string>
-    <string name="time_location_detail">Data obtained on: %1$s</string>
-    <string name="latitude_read_detail">Latitude read: %1$l</string>
-    <string name="longitude_read_detail">Longitude read: %1$l</string>
+    <string name="time_location_detail">Read time: <![CDATA[<b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
+    <string name="latitude_read_detail">Latitude read: <![CDATA[<b> %1$s </b>]]></string>
+    <string name="longitude_read_detail">Longitude read: <![CDATA[<b> %1$s </b>]]></string>
+    <string name="altitude_read_detail">Altitude read: <![CDATA[<b> %1$s </b>]]></string>
     <string name="back_button_desctiption">back_to_location_list</string>
     <string name="altitude_label">Altitude</string>
-    <string name="altitude_read_detail">Altitude read: %1$l</string>
+    <string name="num_of_element">Number of element <![CDATA[<b> %1$d </b>]]> </string>
 </resources>

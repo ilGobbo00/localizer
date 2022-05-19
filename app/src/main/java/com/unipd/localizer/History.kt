@@ -1,6 +1,9 @@
 package com.unipd.localizer
 
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import kotlinx.coroutines.runBlocking
 
 class History : Fragment(){
     private lateinit var  positionButton: TextView
@@ -41,6 +45,12 @@ class History : Fragment(){
         val recyclerView: RecyclerView = view.findViewById(R.id.locations_list)
         recyclerView.adapter = LocationAdapter(allLocations!!)
 
+        val elementNum: TextView? = view?.findViewById(R.id.number_element_label)
+//        elementNum?.text = getString(R.string.num_of_element, allLocations.size)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            elementNum?.text = Html.fromHtml(getString(R.string.num_of_element, allLocations.size), FROM_HTML_MODE_LEGACY)
+        else
+            elementNum?.text = getString(R.string.num_of_element, allLocations.size)
         return view
     }
 }
