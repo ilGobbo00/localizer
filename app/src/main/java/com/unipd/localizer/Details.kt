@@ -60,12 +60,18 @@ class Details:Fragment() {
         }
 
         if(locationToDisplay == null){
+            val title: TextView = view.findViewById(R.id.title_position_detail)
             val errorDay: String = SimpleDateFormat("dd-MM-yyyy").format(timestamp)
             val errorTime: String = SimpleDateFormat("kk:mm:ss.SSS").format(timestamp)
-            time?.text = getString(R.string.invalid_location_detail, errorDay, errorTime)
-            latitude?.text = getString(R.string.invalid_home_data)
-            longitude?.text = getString(R.string.invalid_home_data)
-            altitude?.text = getString(R.string.invalid_home_data)
+
+            title.text = getString(R.string.location_details_title_error)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                time?.text = Html.fromHtml(getString(R.string.invalid_location_detail, errorDay, errorTime), FROM_HTML_MODE_LEGACY)
+            else
+                time?.text = getString(R.string.invalid_location_detail, errorDay, errorTime)
+            latitude?.text = getString(R.string.invalid_location_hint)
+            longitude?.text = ""
+            altitude?.text = ""
             return view
         }
 

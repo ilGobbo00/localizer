@@ -33,6 +33,11 @@ class LocationRepository(private val locationDao: LocationDao) {
     }
 
     @WorkerThread
+    suspend fun deleteAll(){
+        locationDao.deleteAll()
+    }
+
+    @WorkerThread
     suspend fun deleteOld(){
         locationDao.deleteOld()
     }

@@ -18,7 +18,8 @@
     <string name="longitude_label">Longitude</string>
     <string name="invalid_home_data">Invalid data</string>
     <string name="invalid_position_label">None</string>
-    <string name="invalid_location_detail">Unable to get location read on: %1$s at %2$s</string>
+    <string name="location_details_title_error">Error reading \nlocation details</string>
+    <string name="invalid_location_detail">Unable to get location read on<![CDATA[<br><b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
     <string name="location_details_title">location details</string>
     <string name="time_location_detail">Read time: <![CDATA[<b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
     <string name="latitude_read_detail">Latitude read: <![CDATA[<b> %1$s </b>]]></string>
@@ -27,4 +28,18 @@
     <string name="back_button_desctiption">back_to_location_list</string>
     <string name="altitude_label">Altitude</string>
     <string name="num_of_element">Number of element <![CDATA[<b> %1$d </b>]]> </string>
+    <string name="stop_backgound_service">Stop background service</string>
+    <string name="start_background_service">Start background service</string>
+    <string name="running_service">start</string>
+    <string name="service_not_running">stop</string>
+    <string name="starting_background_service">Background service started!</string>
+    <string name="stopping_background_service">Background service stopped!</string>
+    <string name="channel_name">Background Localizer Service</string>
+    <string name="channel_description">Localizer notification about background service</string>
+    <string name="app_description">Locations are being saved</string>
+    <string name="delete_locations">delete_locations</string>
+    <string name="delete_all_locations">Delete all location stored</string>
+    <string name="delete_toast">Refresh this page to see the results</string>
+    <string name="unknown">Unknown</string>
+    <string name="invalid_location_hint">Can\'t read a deleted location details</string>
 </resources>

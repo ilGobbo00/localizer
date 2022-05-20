@@ -17,7 +17,7 @@ class ReferenceLocationRepo(application: Application): AndroidViewModel(applicat
     lateinit var lastRequestedLocation: LocationEntity
 
     init{
-        val locationsDao = LocationsDatabase.getDatabase(application, viewModelScope).locationDao()
+        val locationsDao = LocationsDatabase.getDatabase(application/*, viewModelScope*/).locationDao()
         repo = LocationRepository(locationsDao)
         allLocations = repo.allLocations
     }
@@ -42,6 +42,10 @@ class ReferenceLocationRepo(application: Application): AndroidViewModel(applicat
 
     suspend fun getOldestLocation(): Long?{
         return repo.getOldestLocation()
+    }
+
+    fun deleteAll()= viewModelScope.launch(Dispatchers.IO){
+        repo.deleteAll()
     }
 
     fun deleteOld() = viewModelScope.launch(Dispatchers.IO){

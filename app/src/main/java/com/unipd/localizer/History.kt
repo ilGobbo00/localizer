@@ -8,16 +8,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
-import kotlinx.coroutines.runBlocking
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class History : Fragment(){
     private lateinit var  positionButton: TextView
     private lateinit var  graphButton: TextView
+    private lateinit var  deleteButton: FloatingActionButton
 
     private lateinit var referenceLocationRepo: ReferenceLocationRepo
 
@@ -30,6 +32,7 @@ class History : Fragment(){
 
         positionButton = view.findViewById(R.id.position_button)
         graphButton = view.findViewById(R.id.graph_button)
+        deleteButton = view.findViewById(R.id.delete_all_locations)
 
         positionButton.setOnClickListener { v ->
             val destinationTab = HistoryDirections.actionHistoryPageToPositionPage()
@@ -40,6 +43,15 @@ class History : Fragment(){
             val destinationTab = HistoryDirections.actionHistoryPageToGraphPage()
             Navigation.findNavController(v).navigate(destinationTab)
         }
+
+        deleteButton.setOnClickListener { v ->
+            referenceLocationRepo.deleteAll()
+            Toast.makeText(context, R.string.delete_toast, LENGTH_SHORT).show()
+//            super.onCreateView(inflater, container, savedInstanceState)
+            val destinationTab = HistoryDirections.actionHistoryPageToHistoryPage()
+            Navigation.findNavController(v).navigate(destinationTab)
+        }
+//        }
 
         val allLocations = referenceLocationRepo.allLocations.value                                 //TODO Da vedere se si spacca con .value
         val recyclerView: RecyclerView = view.findViewById(R.id.locations_list)

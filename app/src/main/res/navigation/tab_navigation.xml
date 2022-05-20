@@ -39,6 +39,10 @@
         <action
             android:id="@+id/action_historyPage_to_detailPage"
             app:destination="@id/locationDetail"/>
+        <action
+            android:id="@+id/action_historyPage_to_historyPage"
+            app:destination="@id/historyPage"
+            app:popUpTo="@id/positionPage"/>
     </fragment>
 
     <fragment
