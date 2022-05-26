@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BackgroundLocation" android:enabled="true" android:exported="false"/>
+        <service android:name=".BackgroundLocation" android:foregroundServiceType="location" android:enabled="true" android:exported="false"/>
     </application>
 
 </manifest>

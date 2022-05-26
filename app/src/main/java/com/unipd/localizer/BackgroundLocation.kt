@@ -7,20 +7,17 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class BackgroundLocation() : Service() {
+class BackgroundLocation : Service() {
     private var serviceActiveNewRequest = false
     private var serviceActiveOldRequest = false
     private var permissionsObtained = false
@@ -120,7 +117,7 @@ class BackgroundLocation() : Service() {
                             currentLocation?.altitude.toString())
 
                         runBlocking(Dispatchers.IO){
-                            locationsDatabase.locationDao().insertLocation(entry)
+                            locationsDatabase.locationDao().insertLocation(entry) // TODO Cercare di fare con ReferenceLocationRepo
                         }
 //                    }
                     super.onLocationResult(locationResult)
@@ -128,9 +125,6 @@ class BackgroundLocation() : Service() {
             },
             Looper.getMainLooper()
         )
-
-
-
 
         val notificationBuilder: Notification.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -140,7 +134,10 @@ class BackgroundLocation() : Service() {
             notificationBuilder.setSmallIcon(R.drawable.temp_notification_icon)
             val notification = notificationBuilder.build()
             val notificationID = 1224272
-            startForeground(notificationID, notification)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                startForeground(notificationID, notification, FOREGROUND_SERVICE_TYPE_LOCATION)
+            else
+                startForeground(notificationID, notification)
         }
     }
 

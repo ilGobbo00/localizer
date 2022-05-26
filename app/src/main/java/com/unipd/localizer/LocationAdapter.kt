@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import kotlin.coroutines.coroutineContext
@@ -20,6 +22,7 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
         fun bind(word: String) {
             locationLabel.text = word
         }
+
     }
     private val onClickListener = View.OnClickListener { view ->
         val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()    // Get human readable time

@@ -59,6 +59,7 @@ class Details:Fragment() {
 //            Log.d("CoExecution", "Location got from db: ${referenceLocationRepo.getLocation(timestamp)}")
         }
 
+
         if(locationToDisplay == null){
             val title: TextView = view.findViewById(R.id.title_position_detail)
             val errorDay: String = SimpleDateFormat("dd-MM-yyyy").format(timestamp)
