@@ -13,14 +13,24 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.room.Room
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.unipd.localizer.databinding.LocationDetailBinding
+import com.unipd.localizer.databinding.PositionPageBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 
 class Details:Fragment() {
+//    private var _binding: LocationDetailBinding? = null
+//    private val binding get() = _binding!!
+
     var backButton: FloatingActionButton? = null
-    private lateinit var referenceLocationRepo: ReferenceLocationRepo
+
+//    private lateinit var referenceLocationRepo: ReferenceLocationRepo
+    private lateinit var database : LocationsDatabase
+    private lateinit var dbManager : LocationDao
 
     // Labels
     private var time: TextView? = null
@@ -31,7 +41,9 @@ class Details:Fragment() {
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
+//        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
+        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+        dbManager = database.locationDao()
 
         val view = inflater.inflate(R.layout.location_detail, container, false)
         backButton = view?.findViewById(R.id.back_to_list)          // Due to orientation change, view can be null
@@ -41,6 +53,10 @@ class Details:Fragment() {
         }
 
         // Reference to labels
+//        time = binding.locationTimeDetail
+//        latitude = binding.locationLatitudeDetail
+//        longitude = binding.locationLongitudeDetail
+//        altitude = binding.locationAltitudeDetail
         time = view?.findViewById(R.id.location_time_detail)
         latitude = view?.findViewById(R.id.location_latitude_detail)
         longitude = view?.findViewById(R.id.location_longitude_detail)
@@ -53,14 +69,38 @@ class Details:Fragment() {
 
 
         // Location to display
-        var locationToDisplay: LocationEntity?
-        runBlocking(Dispatchers.IO){
-            locationToDisplay = referenceLocationRepo.getLocation(timestamp!!)
+        var locationToDisplay: LocationEntity? = null
+        runBlocking{
+//            var locationToDisplay: LocationEntity
+            // Display loading text
+            time?.text = getString(R.string.loading_details)
+            latitude?.text = getString(R.string.loading_details)
+            longitude?.text = getString(R.string.loading_details)
+            altitude?.text = getString(R.string.loading_details)
+
+            launch {
+//                locationToDisplay = referenceLocationRepo.getLocation(timestamp!!)
+                locationToDisplay = timestamp?.let { dbManager.getLocation(it) }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    time?.text = Html.fromHtml(getString(R.string.time_location_detail, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp)), FROM_HTML_MODE_LEGACY)
+                    latitude?.text = Html.fromHtml(getString(R.string.latitude_read_detail, locationToDisplay?.location!!.latitude.toString()), FROM_HTML_MODE_LEGACY)
+                    longitude?.text = Html.fromHtml(getString(R.string.longitude_read_detail, locationToDisplay?.location!!.longitude.toString()), FROM_HTML_MODE_LEGACY)
+                    altitude?.text = Html.fromHtml(getString(R.string.altitude_read_detail, locationToDisplay?.location!!.altitude.toString()), FROM_HTML_MODE_LEGACY)
+                }else{
+                    time?.text = getString(R.string.time_location_detail, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp))
+                    latitude?.text = getString(R.string.latitude_read_detail, locationToDisplay?.location!!.latitude.toString())
+                    longitude?.text = getString(R.string.longitude_read_detail, locationToDisplay?.location!!.longitude.toString())
+                    altitude?.text = getString(R.string.altitude_read_detail, locationToDisplay?.location!!.altitude.toString())
+                }
+            }
+
 //            Log.d("CoExecution", "Location got from db: ${referenceLocationRepo.getLocation(timestamp)}")
         }
 
 
         if(locationToDisplay == null){
+//            val title: TextView = binding.titlePositionDetail
             val title: TextView = view.findViewById(R.id.title_position_detail)
             val errorDay: String = SimpleDateFormat("dd-MM-yyyy").format(timestamp)
             val errorTime: String = SimpleDateFormat("kk:mm:ss.SSS").format(timestamp)
@@ -76,17 +116,7 @@ class Details:Fragment() {
             return view
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            time?.text = Html.fromHtml(getString(R.string.time_location_detail, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp)), FROM_HTML_MODE_LEGACY)
-            latitude?.text = Html.fromHtml(getString(R.string.latitude_read_detail, locationToDisplay!!.location!!.latitude.toString()), FROM_HTML_MODE_LEGACY)
-            longitude?.text = Html.fromHtml(getString(R.string.longitude_read_detail, locationToDisplay!!.location!!.longitude.toString()), FROM_HTML_MODE_LEGACY)
-            altitude?.text = Html.fromHtml(getString(R.string.altitude_read_detail, locationToDisplay!!.location!!.altitude.toString()), FROM_HTML_MODE_LEGACY)
-        }else{
-            time?.text = getString(R.string.time_location_detail, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp))
-            latitude?.text = getString(R.string.latitude_read_detail, locationToDisplay!!.location!!.latitude.toString())
-            longitude?.text = getString(R.string.longitude_read_detail, locationToDisplay!!.location!!.longitude.toString())
-            altitude?.text = getString(R.string.altitude_read_detail, locationToDisplay!!.location!!.altitude.toString())
-        }
+
 
         Log.d("Execution", "Return from Detail")
         return view

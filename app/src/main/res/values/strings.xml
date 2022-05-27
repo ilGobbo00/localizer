@@ -42,4 +42,5 @@
     <string name="delete_toast">Refresh this page to see the results</string>
     <string name="unknown">Unknown</string>
     <string name="invalid_location_hint">Can\'t read a deleted location details</string>
+    <string name="loading_details">Loading..</string>
 </resources>

@@ -13,8 +13,11 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.room.Room
 import com.google.android.gms.location.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class BackgroundLocation : Service() {
@@ -22,8 +25,36 @@ class BackgroundLocation : Service() {
     private var serviceActiveOldRequest = false
     private var permissionsObtained = false
 
+    private val locationCallback = object : LocationCallback() {
+        // Called when device location information is available.
+        override fun onLocationResult(locationResult : LocationResult){
+            val lastLocation = locationResult.lastLocation
+            currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude, lastLocation.altitude)
+
+            // Then insert new valid position
+            val entry = LocationEntity(lastLocation.time, currentLocation)
+            Log.i("Localizer/Background", "Saving ? - " +
+                    "${lastLocation.time} | " +
+                    "${currentLocation?.latitude.toString()} | " +
+                    "${currentLocation?.longitude.toString()}  | " +
+                    currentLocation?.altitude.toString())
+
+            runBlocking{
+                launch{
+                    dbManager.insertLocation(entry)
+                }
+//                locationsDatabase.locationDao().insertLocation(entry) // TODO Cercare di fare con ReferenceLocationRepo
+            }
+//                    }
+            super.onLocationResult(locationResult)
+        }
+    }
+
+
     // Database variables/values
 //    private lateinit var referenceLocationRepo: ReferenceLocationRepo
+    private lateinit var database : LocationsDatabase
+    private lateinit var dbManager : LocationDao
 
     // Variable for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -59,9 +90,9 @@ class BackgroundLocation : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("Localizer/Service", "onStartCommand")
+        Log.d("Localizer/Background", "onStartCommand")
         serviceActiveNewRequest = intent?.getBooleanExtra(BACKGROUND_SERVICE, false) ?: false
-        Log.d("Localizer/Service", "oldRequest: $serviceActiveOldRequest, newRequest: $serviceActiveNewRequest")
+        Log.d("Localizer/Background", "oldRequest: $serviceActiveOldRequest, newRequest: $serviceActiveNewRequest")
         if(!serviceActiveOldRequest && serviceActiveNewRequest) {
             serviceActiveOldRequest = serviceActiveNewRequest
             backgroundLocalizer()
@@ -79,7 +110,9 @@ class BackgroundLocation : Service() {
         Log.d("Localizer/Service", "Permissions obtained, start backgroundLocalizer")
 
 //        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
-        val locationsDatabase = LocationsDatabase.getDatabase(this)
+//        val locationsDatabase = LocationsDatabase.getDatabase(this)
+        database = Room.databaseBuilder(applicationContext, LocationsDatabase::class.java, "locations").build()
+        dbManager = database.locationDao()
 
         val locationRequest: LocationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -92,39 +125,7 @@ class BackgroundLocation : Service() {
 //            return view
 //        }
 
-        fusedLocationClient.requestLocationUpdates(
-            locationRequest,
-            object : LocationCallback() {
-                // Called when device location information is available.
-                override fun onLocationResult(locationResult : LocationResult){
-                    val lastLocation = locationResult.lastLocation
-                    currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude, lastLocation.altitude)
-//                    Log.d("Localizer/Background", "time: ${lastLocation.time} " +
-//                            "- lat: ${currentLocation?.latitude.toString()} " +
-//                            "- long: ${currentLocation?.longitude.toString()} " +
-//                            "- alt: ${currentLocation?.altitude.toString()}")
-
-                    // Insert an entry with valid currentLocation
-//                    activity?.lifecycleScope?.launch {
-//                        Log.d("BackgroundExecution", "CoroutineScope")
-
-                        // Then insert new valid position
-                        val entry = LocationEntity(lastLocation.time, currentLocation)
-                    Log.i("Localizer/Background", "Saving ? - " +
-                            "${lastLocation.time} | " +
-                            "${currentLocation?.latitude.toString()} | " +
-                            "${currentLocation?.longitude.toString()}  | " +
-                            currentLocation?.altitude.toString())
-
-                        runBlocking(Dispatchers.IO){
-                            locationsDatabase.locationDao().insertLocation(entry) // TODO Cercare di fare con ReferenceLocationRepo
-                        }
-//                    }
-                    super.onLocationResult(locationResult)
-                }
-            },
-            Looper.getMainLooper()
-        )
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
         val notificationBuilder: Notification.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

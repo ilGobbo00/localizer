@@ -31,18 +31,35 @@ import androidx.room.RoomDatabase
 import com.google.android.gms.location.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.unipd.localizer.BackgroundLocation.Companion.BACKGROUND_SERVICE
+import com.unipd.localizer.databinding.PositionPageBinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.ceil
 
 
 class Position : Fragment() {
+    // Variable to get view objects
+//    private var _binding: PositionPageBinding? = null
+//    private val binding get() = _binding!!
+
     // Database variables/values
-    private lateinit var referenceLocationRepo: ReferenceLocationRepo
+//    private lateinit var referenceLocationRepo: ReferenceLocationRepo
+    private lateinit var database : LocationsDatabase
+    private lateinit var dbManager : LocationDao
+
 
     // Navigation buttons
-    private lateinit var  historyButton: TextView
-    private lateinit var  graphButton: TextView
+    private lateinit var historyButton: TextView /*= binding.historyButton.setOnClickListener { v ->
+        val destinationTab = PositionDirections.actionPositionPageToHistoryPage()
+        Navigation.findNavController(v).navigate(destinationTab)
+    }*/
+
+    private lateinit var graphButton: TextView/* = binding.graphButton.setOnClickListener { v ->
+        val destinationTab = PositionDirections.actionPositionPageToGraphPage()
+        Navigation.findNavController(v).navigate(destinationTab)
+    }*/
+
+
 
     // Background service button
     private lateinit var backgroundButton: FloatingActionButton
@@ -50,9 +67,9 @@ class Position : Fragment() {
     // Variables for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: SimpleLocationItem? = null
-    var latitudeField: TextView? = null
-    var longitudeField: TextView? = null
-    var altitudeField: TextView? = null
+    private var latitudeField: TextView? = null
+    private var longitudeField: TextView? = null
+    private var altitudeField: TextView? = null
 
     // Variable for enable background service
     private var backgroundService = false
@@ -72,8 +89,12 @@ class Position : Fragment() {
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+//        _binding = PositionPageBinding.inflate(inflater, container, false)
+
         // Reference to database repository
-        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
+//        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
+        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+        dbManager = database.locationDao()
 
         // Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(MODE_PRIVATE)
@@ -83,6 +104,9 @@ class Position : Fragment() {
         var permissionObtained = false
 
         // Find buttons references
+//        historyButton = binding.historyButton
+//        graphButton = binding.graphButton
+//        backgroundButton = binding.startStopBackgroundService
         historyButton = view.findViewById(R.id.history_button)
         graphButton = view.findViewById(R.id.graph_button)
         backgroundButton = view.findViewById(R.id.start_stop_background_service)
@@ -133,6 +157,9 @@ class Position : Fragment() {
             return view
         }
 
+//        latitudeField = binding.latitudeField
+//        longitudeField = binding.longitudeField
+//        altitudeField = binding.altitudeField
         latitudeField = view.findViewById(R.id.latitude_field)
         longitudeField = view.findViewById(R.id.longitude_field)
         altitudeField = view.findViewById(R.id.altitude_field)
@@ -144,20 +171,20 @@ class Position : Fragment() {
         }
 
         // Wait until there are some data. If there are too much elements, delete all data older than OLDEST_DATA
-        referenceLocationRepo.allLocations.observe(
-            requireActivity()
-        ) { locations ->
-            if (locations != null && locations.size >= MAX_SIZE) {
-                Log.i("Localizer/Execution", "Before deleting old data")
-                referenceLocationRepo.deleteOld()
-//                Log.d("Execution", "Current ${referenceLocationRepo.allLocations.value?.size} data: ${referenceLocationRepo.allLocations.value}")
-            }
-
-        }
+//        referenceLocationRepo.allLocations.observe(
+//            requireActivity()
+//        ) { locations ->
+//            if (locations != null && locations.size >= MAX_SIZE) {
+//                Log.i("Localizer/Execution", "Before deleting old data")
+//                referenceLocationRepo.deleteOld()
+////                Log.d("Execution", "Current ${referenceLocationRepo.allLocations.value?.size} data: ${referenceLocationRepo.allLocations.value}")
+//            }
+//
+//        }
 
 //        Log.d("Execution", "Before locationPermissionRequest")
         val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            run {
+            //run {
                 permissionObtained = true
                 for (permission in permissions) {
                     Log.i("Localizer/Permissions", "Checking: $permission")
@@ -168,7 +195,7 @@ class Position : Fragment() {
                       Log.i("Localizer/Permissions", "Permission obtained")
                       val locationRequest: LocationRequest = LocationRequest.create()
                       locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                        locationRequest.interval = REFRESH_TIME.toLong()
+                      locationRequest.interval = REFRESH_TIME.toLong()
 
 
                         fusedLocationClient.requestLocationUpdates(
@@ -181,25 +208,33 @@ class Position : Fragment() {
                                     latitudeField?.text = currentLocation?.latitude.toString()             // Display data if a location is available
                                     longitudeField?.text = currentLocation?.longitude.toString()
                                     altitudeField?.text = currentLocation?.altitude.toString()
-//                                    Log.i("Localizer/Data read", "time: ${lastLocation.time} " +
-//                                            "- lat: ${currentLocation?.latitude.toString()} " +
-//                                            "- long: ${currentLocation?.longitude.toString()} " +
-//                                            "- alt: ${currentLocation?.altitude.toString()}")
 
-                                        // Insert an entry with valid currentLocation
-//                                        activity?.lifecycleScope?.launch {
-//                                          Log.i("Localizer/Execution", "CoroutineScope")
-
-                                            // Then insert new valid position
+                                    runBlocking {
+                                        launch{
                                             val entry = LocationEntity(lastLocation.time, currentLocation)
-//                                            Log.i("Localizer/Execution", "Saving new location n. ${referenceLocationRepo.allLocations.value?.size?.plus(1)} with timestamp: ${entry.timeStamp} and location: ${entry.location}")
-                                            Log.i("Localizer/Execution", "Saving ${referenceLocationRepo.allLocations.value?.size?.plus(1)} - " +
+                                            dbManager.insertLocation(entry)
+                                            val locationList = dbManager.getAllLocations()
+                                            Log.i("Localizer/Execution", "Saving ${locationList.size.plus(1)} - " +
                                                     "${lastLocation.time} | " +
                                                     "${currentLocation?.latitude.toString()} | " +
                                                     "${currentLocation?.longitude.toString()}  | " +
                                                     currentLocation?.altitude.toString())
-
-                                            referenceLocationRepo.insert(entry)
+                                        }
+                                    }
+                                            // Then insert new valid position
+//                                            val entry = LocationEntity(lastLocation.time, currentLocation)
+//                                            Log.i("Localizer/Execution", "Saving ${referenceLocationRepo.allLocations.value?.size?.plus(1)} - " +
+//                                                    "${lastLocation.time} | " +
+//                                                    "${currentLocation?.latitude.toString()} | " +
+//                                                    "${currentLocation?.longitude.toString()}  | " +
+//                                                    currentLocation?.altitude.toString())
+//
+////                                            referenceLocationRepo.insert(entry)
+//                                            runBlocking {
+//                                                launch{
+//                                                    dbManager.insertLocation(entry)
+//                                                }
+//                                            }
 //                                        }
                                     super.onLocationResult(locationResult)
                                 }
@@ -207,7 +242,7 @@ class Position : Fragment() {
                             requireContext().mainLooper
                         )
                 }
-            }
+           // }
         }
 //        Log.d("Execution", "After locationPermissionRequest: $locationPermissionRequest")
         if(!permissionObtained) {
@@ -259,6 +294,7 @@ class Position : Fragment() {
             backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
             requireContext().startService(backgroundIntent)
         }
+
 
         super.onPause()
     }

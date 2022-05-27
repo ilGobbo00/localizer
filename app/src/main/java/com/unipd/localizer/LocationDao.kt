@@ -11,43 +11,31 @@ import java.util.*
 @Dao
 interface LocationDao {
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        fun insertLocation(location: LocationEntity)
+        suspend fun insertLocation(location: LocationEntity)
 
         @Query("SELECT * FROM locations ORDER BY timeStamp DESC")
-        fun getAllLocations(): LiveData<List<LocationEntity>>
+        suspend fun getAllLocations(): List<LocationEntity>
 
 //        @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
 //        fun getLocation(timestamp: Long): LiveData<LocationEntity>
 
         @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
-        fun getLocation(timestamp: Long): LocationEntity?
+        suspend fun getLocation(timestamp: Long): LocationEntity?
 
         @Query("SELECT MIN(timeStamp) FROM locations")
-        fun getOldestTimeSaved() : Long?
+        suspend fun getOldestTimeSaved() : Long?
 
         @Transaction
-        fun deleteOld(){
+        suspend fun deleteOld(){
 //                deleteOld(SystemClock.elapsedRealtimeNanos(), (OLDEST_DATA * 1000).toLong())
                 deleteOld(Date().time, OLDEST_DATA.toLong())
         }
 
         @Query("DELETE FROM locations")
-        fun deleteAll()
+        suspend fun deleteAll()
 
         // Deleting data older than 5 minutes
         @Query("DELETE FROM locations WHERE :currentTime - timeStamp > :threshold")
-        fun deleteOld(currentTime: Long, threshold: Long)
-
-//        @Transaction
-//        fun getAllLocationsStringTimestamp(): List<String>{
-//                val locationList = getAllLocations()
-//                val strList = mutableListOf<String>()
-//
-//                // TODO - Sicuramente crasha quando cerca di fare locationList.value, Da provare
-//                for(location in locationList.value!!)
-//                        strList.add(location.timeStamp.toString())    // Only a no null location is stored
-//
-//                return strList
-//        }
+        suspend fun deleteOld(currentTime: Long, threshold: Long)
 
 }
