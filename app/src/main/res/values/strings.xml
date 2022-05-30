@@ -43,4 +43,6 @@
     <string name="unknown">Unknown</string>
     <string name="invalid_location_hint">Can\'t read a deleted location details</string>
     <string name="loading_details">Loading..</string>
+    <string name="elements_deleted">All saved items  have been deleted</string>
+    <string name="permissions_denied">Required permissions are denied!</string>
 </resources>

@@ -15,11 +15,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.room.Room
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.unipd.localizer.databinding.LocationDetailBinding
-import com.unipd.localizer.databinding.PositionPageBinding
+//import com.unipd.localizer.databinding.LocationDetailBinding
+//import com.unipd.localizer.databinding.PositionPageBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 
 class Details:Fragment() {

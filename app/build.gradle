@@ -12,7 +12,8 @@ android {
     defaultConfig {
         applicationId "com.unipd.localizer"
         minSdk 21
-        targetSdk 32
+        maxSdk 30 // Due to API>30 restrictions
+        targetSdk 29
         versionCode 1
         versionName "1.0"
 
@@ -32,9 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildFeatures {
-        viewBinding = true
-    }
+//    buildFeatures {
+//        viewBinding = true
+//    }
 }
 
 
@@ -53,6 +54,7 @@ dependencies {
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    implementation 'androidx.fragment:fragment:1.4.1'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'
