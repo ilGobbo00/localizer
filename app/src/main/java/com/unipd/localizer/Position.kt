@@ -5,6 +5,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -36,7 +37,10 @@ class Position : Fragment() {
     // Navigation buttons
     private lateinit var historyButton: TextView
     private lateinit var graphButton: TextView
+
+    // Flag used to start/stop requestLocationUpdates
     private var switchingTabs = false
+    private var orientationChanged = false
 
     // Background service button
     private lateinit var backgroundButton: FloatingActionButton
@@ -190,8 +194,7 @@ class Position : Fragment() {
                                 lastLocation.longitude,
                                 lastLocation.altitude
                             )
-                            latitudeField?.text =
-                                currentLocation?.latitude.toString()             // Display data if a location is available
+                            latitudeField?.text = currentLocation?.latitude.toString()             // Display data if a location is available
                             longitudeField?.text = currentLocation?.longitude.toString()
                             altitudeField?.text = currentLocation?.altitude.toString()
 
@@ -262,13 +265,18 @@ class Position : Fragment() {
         super.onResume()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        orientationChanged = true
+    }
+
     override fun onPause() {
         Log.d("Localizer/Lifecycle", "OnPause")
-        if(this::locationCallback.isInitialized)
+        if(this::locationCallback.isInitialized && !orientationChanged)
             fusedLocationClient.removeLocationUpdates(locationCallback)
 
 
-        if((!switchingTabs && backgroundService) || switchingTabs) {
+        if(switchingTabs || (!switchingTabs && backgroundService)) {
 
             // If user enable background service start it
             Log.d("Localizer/Lifecycle", "OnPause --> try to start service")

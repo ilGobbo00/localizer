@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.os.persistableBundleOf
 import androidx.room.Room
+import com.google.android.gms.location.LocationCallback
 
 class MainActivity : AppCompatActivity() {
     private lateinit var persistentState: SharedPreferences
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object{
         const val PERMISSIONS = "permissions"
+        val locationCallback: LocationCallback? = null
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         // Get SharedPreferences reference

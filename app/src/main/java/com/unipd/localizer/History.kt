@@ -3,6 +3,7 @@ package com.unipd.localizer
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -22,12 +23,15 @@ import androidx.room.Room
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
+import com.unipd.localizer.Details.Companion.SHOW_DETAILS
 import com.unipd.localizer.Position.Companion.BACKGROUND_RUNNING
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class History : Fragment(){
+    // Flag used to start/stop requestLocationUpdates
     private var switchingTabs = false
+    private var orientationChanged = false
 
     private lateinit var  positionButton: TextView
     private lateinit var  graphButton: TextView
@@ -87,12 +91,12 @@ class History : Fragment(){
             elementNum?.text = getString(R.string.loading_details)
             launch{
                 allLocations = dbManager.getAllLocations()
-                recyclerView.adapter = LocationAdapter(allLocations!!)
+                recyclerView.adapter = LocationAdapter(allLocations!!, activity)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     elementNum?.text = Html.fromHtml(getString(R.string.num_of_element, allLocations?.size), FROM_HTML_MODE_LEGACY)
                 else
-                    elementNum?.text = getString(R.string.num_of_element, allLocations?.size)
+                    elementNum?.text = getString(R.string.num_of_element_compat, allLocations?.size)
             }
         }
 
@@ -100,13 +104,26 @@ class History : Fragment(){
     }
 
     override fun onPause() {
+        Log.d("Localizer/Orientation", "onPause, orientationChanged = $orientationChanged")
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
-        if(!switchingTabs && !backgroundService) {
+        val showDetails = persistentState.getBoolean(SHOW_DETAILS, false)
+        if(!switchingTabs && !backgroundService && !orientationChanged && !showDetails) {
             val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
             backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
             requireContext().stopService(backgroundIntent)
         }
 
         super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Localizer/Orientation", "orientationChanged = $orientationChanged")
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        orientationChanged = true
+        Log.d("Localizer/Orientation", "Orientation changed ($orientationChanged)")
     }
 }

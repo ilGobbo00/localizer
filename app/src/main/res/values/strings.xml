@@ -20,15 +20,21 @@
     <string name="invalid_position_label">None</string>
     <string name="location_details_title_error">Error reading \nlocation details</string>
     <string name="invalid_location_detail">Unable to get location read on<![CDATA[<br><b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
+    <string name="invalid_location_detail_compat">Unable to get location read on\n%1$s at  %2$s </string>
     <string name="location_details_title">location details</string>
     <string name="time_location_detail">Read time: <![CDATA[<b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
     <string name="latitude_read_detail">Latitude read: <![CDATA[<b> %1$s </b>]]></string>
     <string name="longitude_read_detail">Longitude read: <![CDATA[<b> %1$s </b>]]></string>
     <string name="altitude_read_detail">Altitude read: <![CDATA[<b> %1$s </b>]]></string>
-    <string name="back_button_desctiption">back_to_location_list</string>
+    <string name="time_location_detail_compat">Read time: %1$s at %2$s </string>
+    <string name="latitude_read_detail_compat">Latitude read: %1$s</string>
+    <string name="longitude_read_detail_compat">Longitude read: %1$s</string>
+    <string name="altitude_read_detail_compat">Altitude read: %1$s</string>
+    <string name="back_button_description">back_to_location_list</string>
     <string name="altitude_label">Altitude</string>
     <string name="num_of_element">Number of element <![CDATA[<b> %1$d </b>]]> </string>
-    <string name="stop_backgound_service">Stop background service</string>
+    <string name="num_of_element_compat">Number of element %1$d</string>
+    <string name="stop_background_service">Stop background service</string>
     <string name="start_background_service">Start background service</string>
     <string name="running_service">start</string>
     <string name="service_not_running">stop</string>
@@ -45,4 +51,5 @@
     <string name="loading_details">Loading..</string>
     <string name="elements_deleted">All saved items  have been deleted</string>
     <string name="permissions_denied">Required permissions are denied!</string>
+    <string name="chart_title">This graph shows how much fast the device goes\n(based on saved data)</string>
 </resources>

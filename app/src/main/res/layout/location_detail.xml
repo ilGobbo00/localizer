@@ -180,6 +180,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/arrow_back"
-        android:contentDescription="@string/back_button_desctiption"/>
+        android:contentDescription="@string/back_button_description"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

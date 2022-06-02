@@ -1,6 +1,10 @@
 package com.unipd.localizer
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -24,10 +28,15 @@ import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 
 class Details:Fragment() {
-//    private var _binding: LocationDetailBinding? = null
-//    private val binding get() = _binding!!
+    // Flag used to start/stop requestLocationUpdates
+    private var orientationChanged = false
+    private var backPressed = false
 
-    var backButton: FloatingActionButton? = null
+    // Shared preferences for start/stop background service button
+    private lateinit var persistentState: SharedPreferences
+    private lateinit var persistentStateEditor: SharedPreferences.Editor
+
+    private var backButton: FloatingActionButton? = null
 
 //    private lateinit var referenceLocationRepo: ReferenceLocationRepo
     private lateinit var database : LocationsDatabase
@@ -39,6 +48,17 @@ class Details:Fragment() {
     private var longitude: TextView? = null
     private var altitude: TextView? = null
 
+    companion object{
+        const val SHOW_DETAILS = "show_details"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        persistentStateEditor = persistentState.edit()
+        persistentStateEditor.putBoolean(SHOW_DETAILS, false)
+        persistentStateEditor.apply()
+    }
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,11 +66,16 @@ class Details:Fragment() {
         database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
         dbManager = database.locationDao()
 
+        // Get SharedPreferences reference
+        persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        persistentStateEditor = persistentState.edit()
+
         val view = inflater.inflate(R.layout.location_detail, container, false)
         backButton = view?.findViewById(R.id.back_to_list)          // Due to orientation change, view can be null
         backButton?.setOnClickListener { clickView ->
             val destinationTab = DetailsDirections.actionDetailPageToHistoryPage()
             Navigation.findNavController(clickView).navigate(destinationTab)
+            backPressed = true
         }
 
         // Reference to labels
@@ -89,10 +114,10 @@ class Details:Fragment() {
                     longitude?.text = Html.fromHtml(getString(R.string.longitude_read_detail, locationToDisplay?.location!!.longitude.toString()), FROM_HTML_MODE_LEGACY)
                     altitude?.text = Html.fromHtml(getString(R.string.altitude_read_detail, locationToDisplay?.location!!.altitude.toString()), FROM_HTML_MODE_LEGACY)
                 }else{
-                    time?.text = getString(R.string.time_location_detail, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp))
-                    latitude?.text = getString(R.string.latitude_read_detail, locationToDisplay?.location!!.latitude.toString())
-                    longitude?.text = getString(R.string.longitude_read_detail, locationToDisplay?.location!!.longitude.toString())
-                    altitude?.text = getString(R.string.altitude_read_detail, locationToDisplay?.location!!.altitude.toString())
+                    time?.text = getString(R.string.time_location_detail_compat, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp))
+                    latitude?.text = getString(R.string.latitude_read_detail_compat, locationToDisplay?.location!!.latitude.toString())
+                    longitude?.text = getString(R.string.longitude_read_detail_compat, locationToDisplay?.location!!.longitude.toString())
+                    altitude?.text = getString(R.string.altitude_read_detail_compat, locationToDisplay?.location!!.altitude.toString())
                 }
             }
 
@@ -110,7 +135,7 @@ class Details:Fragment() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 time?.text = Html.fromHtml(getString(R.string.invalid_location_detail, errorDay, errorTime), FROM_HTML_MODE_LEGACY)
             else
-                time?.text = getString(R.string.invalid_location_detail, errorDay, errorTime)
+                time?.text = getString(R.string.invalid_location_detail_compat, errorDay, errorTime)
             latitude?.text = getString(R.string.invalid_location_hint)
             longitude?.text = ""
             altitude?.text = ""
@@ -121,6 +146,22 @@ class Details:Fragment() {
 
         Log.d("Execution", "Return from Detail")
         return view
+    }
+
+    override fun onPause() {
+        val backgroundService = persistentState.getBoolean(Position.BACKGROUND_RUNNING, false)
+        if(!backPressed && !orientationChanged && !backgroundService) {
+            val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
+            backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
+            requireContext().stopService(backgroundIntent)
+        }
+
+        super.onPause()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        orientationChanged = true
     }
 }
 //}
