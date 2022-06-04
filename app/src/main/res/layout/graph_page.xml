@@ -154,33 +154,74 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/chart_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text = "@string/chart_title"
-        android:textColor="@color/black"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/tab_menu"
-        app:layout_constraintBottom_toTopOf="@+id/chart"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
-
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/chart_title"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_menu"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        />
+        app:layout_constraintVertical_bias="0.3">
 
 
+        <TextView
+            android:id="@+id/locations_chart_title"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="2"
+            android:text="@string/locations_chart_title"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/chartLocations"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tab_menu" />
 
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartLocations"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_weight="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/locations_chart_title" />
+
+        <TextView
+            android:id="@+id/altitude_chart_title"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="2"
+            android:text="@string/altitudes_chart_title"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/chartLocations"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tab_menu"
+            android:layout_marginTop="15dp"/>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartAltitudes"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_weight="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/locations_chart_title" />
+
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,8 @@ plugins {
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
 }
 
 android {
@@ -74,6 +76,10 @@ dependencies {
 
     // Graph
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    // Google Maps
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'       // For Google Maps
 }
 apply plugin: 'kotlin-kapt'

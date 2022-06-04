@@ -58,6 +58,10 @@
             android:id="@+id/action_graphPage_to_historyPage"
             app:destination="@id/historyPage"
             app:popUpTo="@id/historyPage"/>
+        <action
+            android:id="@+id/action_graphPage_to_graphPage"
+            app:destination="@id/graphPage"
+            app:popUpTo="@id/graphPage"/>
     </fragment>
 
     <fragment
@@ -68,6 +72,10 @@
         <action
             android:id="@+id/action_detailPage_to_historyPage"
             app:destination="@id/historyPage"
+            app:popUpTo="@id/historyPage"/>
+        <action
+            android:id="@+id/action_detailPage_to_detailPage"
+            app:destination="@id/locationDetail"
             app:popUpTo="@id/historyPage"/>
         <argument
             android:name="location"

@@ -9,18 +9,5 @@ import java.util.*
 @Entity (tableName = "locations")
 data class LocationEntity(
     @PrimaryKey(autoGenerate = false) val timeStamp: Long,
-    val location: SimpleLocationItem?
+    val location: SimpleLocationItem
 )
-//{
-//    @Ignore
-//    val debug: String = ""
-//}
-//{
-//    @JvmName("getTimeStamp1")
-//    @Ignore
-//    fun getTimeStamp(): Long {return timeStamp}
-////    fun setTimeStamp(time: Long){timeStamp = time}
-//    @JvmName("getLocation1")
-//    @Ignore
-//    fun getLocation(): Location? {return location}
-//}

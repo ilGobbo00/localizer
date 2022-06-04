@@ -38,13 +38,18 @@ class BackgroundLocation : Service() {
             val entry = LocationEntity(lastLocation.time, currentLocation)
             Log.i("Localizer/Background", "Saving - " +
                     "${lastLocation.time} | " +
-                    "${currentLocation?.latitude.toString()} | " +
-                    "${currentLocation?.longitude.toString()}  | " +
-                    currentLocation?.altitude.toString())
+                    "${currentLocation.latitude.toString()} | " +
+                    "${currentLocation.longitude.toString()}  | " +
+                    currentLocation.altitude.toString())
 
             runBlocking{
                 launch{
                     dbManager.insertLocation(entry)
+                }
+                launch {
+                    val locationList = dbManager.getAllLocations()
+                    if (locationList.size > Position.MAX_SIZE)
+                        dbManager.deleteOld()
                 }
             }
             super.onLocationResult(locationResult)
@@ -59,7 +64,7 @@ class BackgroundLocation : Service() {
 
     // Variable for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var currentLocation: SimpleLocationItem? = null
+    private lateinit var currentLocation: SimpleLocationItem
 
 //    private lateinit var persistentState: SharedPreferences
 //    private lateinit var persistentStateEditor: SharedPreferences.Editor
@@ -119,7 +124,13 @@ class BackgroundLocation : Service() {
 //        }
         Log.d("Localizer/Background", "Permissions obtained, start backgroundLocalizer")
 
-        database = Room.databaseBuilder(applicationContext, LocationsDatabase::class.java, "locations").build()
+//        database = Room.databaseBuilder(applicationContext, LocationsDatabase::class.java, "locations").build()
+        try {
+            database = LocationsDatabase.getDatabase(applicationContext)
+        }catch (e: java.lang.IllegalStateException){
+            Log.e("Localizer/B", "Can't create database due to context error")
+            return
+        }
         dbManager = database.locationDao()
 
         val locationRequest: LocationRequest = LocationRequest.create()
@@ -147,7 +158,7 @@ class BackgroundLocation : Service() {
 
     override fun onDestroy() {
         Log.d("Localizer/Background", "onDestroy")
-//        if(this::locationCallback.isInitialized)
+        if(this::fusedLocationClient.isInitialized)
             fusedLocationClient.removeLocationUpdates(locationCallback)
         stopForeground(true)
 //        serviceActiveOldRequest = false

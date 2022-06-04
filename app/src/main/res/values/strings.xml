@@ -51,5 +51,11 @@
     <string name="loading_details">Loading..</string>
     <string name="elements_deleted">All saved items  have been deleted</string>
     <string name="permissions_denied">Required permissions are denied!</string>
-    <string name="chart_title">This graph shows how much fast the device goes\n(based on saved data)</string>
+    <string name="locations_chart_title">Trend of meters between read locations\n(based on saved data)</string>
+    <string name="altitudes_chart_title">Trend of altitudes read\n(based on saved data)</string>
+    <string name="error">An error occurred %1$s</string>
+    <string name="tooFewItems">There are too few items to show into the charts</string>
+    <string name="noData">There are no data to show into the charts</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
 </resources>

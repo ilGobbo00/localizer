@@ -17,7 +17,7 @@ abstract class LocationsDatabase : RoomDatabase(){
         @Volatile
         private var INSTANCE: LocationsDatabase? = null
 
-        fun getDatabase(context : Context/*, scope: CoroutineScope*/): LocationsDatabase {
+        fun getDatabase(context : Context): LocationsDatabase {
             return INSTANCE ?: synchronized(this){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
@@ -31,11 +31,3 @@ abstract class LocationsDatabase : RoomDatabase(){
         }
     }
 }
-
-//class insertAsyncLocation internal constructor(private val locationDao: LocationDao): AsyncTask<Location, Void, Void>(){
-//
-//    override fun doInBackground(vararg l: Location?): Void? {
-//            l[0]?.let { locationDao.insert(it) }
-//        return null
-//    }
-//}

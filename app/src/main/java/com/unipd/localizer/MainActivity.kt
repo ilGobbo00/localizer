@@ -22,17 +22,18 @@ class MainActivity : AppCompatActivity() {
 
     companion object{
         const val PERMISSIONS = "permissions"
-        val locationCallback: LocationCallback? = null
+        const val SERVICE_RUNNING = "main_service"
     }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         // Get SharedPreferences reference
-        persistentState = this.getPreferences(MODE_PRIVATE)
+        /*persistentState = this.getPreferences(MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
         val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissionObtained = true
             for (permission in permissions) {
-                Log.i("Localizer/Permissions", "Checking: $permission")
+                Log.i("Localizer/MA", "Checking: $permission")
                 permissionObtained = permissionObtained && permission.value
             }
 
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if(!permissionObtained) {
-            Log.i("Localizer/Permissions", "Asking permissions")
+            Log.i("Localizer/MA", "Asking permissions")
             locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
                 locationPermissionRequest.launch(arrayOf(Manifest.permission.FOREGROUND_SERVICE))
@@ -49,10 +50,39 @@ class MainActivity : AppCompatActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
         }else
-            Log.i("Localizer/Permissions", "Permissions already got")
+            Log.i("Localizer/MA", "Permissions already got")*/
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+    }
+
+    override fun onStart() {
+        persistentState = this.getPreferences(MODE_PRIVATE)
+        persistentStateEditor = persistentState.edit()
+
+        val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissionObtained = true
+            for (permission in permissions) {
+                Log.i("Localizer/MA", "Checking: ${permission.key} -> ${permission.value}")
+                permissionObtained = permissionObtained && permission.value
+            }
+
+            persistentStateEditor.putBoolean(PERMISSIONS, permissionObtained)
+            persistentStateEditor.apply()
+        }
+
+        if(!permissionObtained) {
+            Log.i("Localizer/MA", "Asking permissions")
+            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                locationPermissionRequest.launch(arrayOf(Manifest.permission.FOREGROUND_SERVICE))
+
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+//                locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+        }else
+            Log.i("Localizer/MA", "Permissions already got")
+
+        super.onStart()
     }
 }

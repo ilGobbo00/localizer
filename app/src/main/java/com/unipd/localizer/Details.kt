@@ -15,10 +15,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.room.Room
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
+import com.google.android.material.snackbar.Snackbar
 //import com.unipd.localizer.databinding.LocationDetailBinding
 //import com.unipd.localizer.databinding.PositionPageBinding
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +33,7 @@ import kotlinx.coroutines.runBlocking
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 
-class Details:Fragment() {
+class Details:Fragment(), OnMapReadyCallback {
     // Flag used to start/stop requestLocationUpdates
     private var orientationChanged = false
     private var backPressed = false
@@ -48,6 +54,13 @@ class Details:Fragment() {
     private var longitude: TextView? = null
     private var altitude: TextView? = null
 
+    private lateinit var mapFragment: SupportMapFragment
+
+    private lateinit var epochString: String
+
+    // Location to display
+    var locationToDisplay: LocationEntity? = null
+
     companion object{
         const val SHOW_DETAILS = "show_details"
     }
@@ -62,15 +75,20 @@ class Details:Fragment() {
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        referenceLocationRepo = ViewModelProvider(requireActivity()).get(ReferenceLocationRepo::class.java)
-        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+        val view = inflater.inflate(R.layout.location_detail, container, false)
+        try {
+            database = LocationsDatabase.getDatabase(requireContext())
+        }catch (e: IllegalStateException){
+            Log.e("Localizer/P", "Can't create database due to context error")
+            Snackbar.make(view, getString(R.string.error, "with database creation"), LENGTH_LONG).show()
+            return view
+        }
         dbManager = database.locationDao()
 
         // Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
-        val view = inflater.inflate(R.layout.location_detail, container, false)
         backButton = view?.findViewById(R.id.back_to_list)          // Due to orientation change, view can be null
         backButton?.setOnClickListener { clickView ->
             val destinationTab = DetailsDirections.actionDetailPageToHistoryPage()
@@ -90,12 +108,11 @@ class Details:Fragment() {
 
         // Get parameter passed thought fragment.
         // Use the timestamp (unique) to obtain the element from DB after conversion from human-readable date to epoch
-        val epochString: String = DetailsArgs.fromBundle(requireArguments()).location
+        epochString = DetailsArgs.fromBundle(requireArguments()).location
         val timestamp: Long? = SimpleDateFormat("dd-MM-yyyy kk:mm:ss.SSS").parse(epochString)?.time
 
 
-        // Location to display
-        var locationToDisplay: LocationEntity? = null
+
         runBlocking{
 //            var locationToDisplay: LocationEntity
             // Display loading text
@@ -119,10 +136,14 @@ class Details:Fragment() {
                     longitude?.text = getString(R.string.longitude_read_detail_compat, locationToDisplay?.location!!.longitude.toString())
                     altitude?.text = getString(R.string.altitude_read_detail_compat, locationToDisplay?.location!!.altitude.toString())
                 }
+                mapFragment = childFragmentManager.findFragmentByTag("googleMap") as SupportMapFragment
+
             }
 
 //            Log.d("CoExecution", "Location got from db: ${referenceLocationRepo.getLocation(timestamp)}")
         }
+        if(this::mapFragment.isInitialized)
+            mapFragment.getMapAsync(this)
 
 
         if(locationToDisplay == null){
@@ -161,7 +182,20 @@ class Details:Fragment() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        val destinationTab = DetailsDirections.actionDetailPageToDetailPage(epochString)
+        try {
+            Navigation.findNavController(requireView()).navigate(destinationTab)
+        }catch (e: IllegalStateException){}
         orientationChanged = true
     }
+
+    override fun onMapReady(map: GoogleMap) {
+        locationToDisplay?.let{
+            val location = LatLng(locationToDisplay!!.location.latitude, locationToDisplay!!.location.longitude)
+            map.addMarker(MarkerOptions().position(location).title("Location"))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+//            map.animateCamera(CameraUpdateFactory.zoomTo(15f), 1000, null)
+        }
+    }
+
 }
-//}

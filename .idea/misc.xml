@@ -7,13 +7,14 @@
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/drawable/background.xml" value="0.1" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/drawable/selected_tab.xml" value="0.2475" />
-        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout-land/history_page.xml" value="0.13168020521590423" />
-        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout-land/location_detail.xml" value="0.2667806755023514" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout-land/graph_page.xml" value="0.21009918845807032" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout-land/history_page.xml" value="0.22" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout-land/location_detail.xml" value="0.2" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout-port/location_item.xml" value="0.17101325352714836" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/activity_main.xml" value="0.11121408711770157" />
-        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/graph_page.xml" value="0.29674968341072183" />
-        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/history_page.xml" value="0.22" />
-        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/location_detail.xml" value="0.2" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/graph_page.xml" value="0.18" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/history_page.xml" value="0.16" />
+        <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/location_detail.xml" value="0.18" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/location_item.xml" value="0.16547066272688898" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/layout/position_page.xml" value="0.22" />
         <entry key="..\:/Users/ricca/Desktop/SimpleLocalizer/app/src/main/res/mipmap-anydpi-v26/unipd_logo_round.xml" value="0.22" />

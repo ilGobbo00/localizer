@@ -16,9 +16,6 @@ interface LocationDao {
         @Query("SELECT * FROM locations ORDER BY timeStamp DESC")
         suspend fun getAllLocations(): List<LocationEntity>
 
-//        @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
-//        fun getLocation(timestamp: Long): LiveData<LocationEntity>
-
         @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
         suspend fun getLocation(timestamp: Long): LocationEntity?
 
@@ -27,7 +24,6 @@ interface LocationDao {
 
         @Transaction
         suspend fun deleteOld(){
-//                deleteOld(SystemClock.elapsedRealtimeNanos(), (OLDEST_DATA * 1000).toLong())
                 deleteOld(Date().time, OLDEST_DATA.toLong())
         }
 

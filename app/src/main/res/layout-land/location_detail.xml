@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/div_title"
         android:layout_width="match_parent"
@@ -15,6 +16,7 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_alignParentTop="true">
+
 
         <TextView
             android:id="@+id/title"
@@ -101,92 +103,100 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/unipd_id"
             app:layout_constraintVertical_bias="0.0" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/tab_menu"
-        android:layout_width="match_parent"
+        android:id="@+id/location_wrapper"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#EAEAEA"
-        android:layout_below="@id/div_title">
+        android:layout_below="@id/div_title"
+        android:layout_marginRight="30dp">
 
         <TextView
-            android:id="@+id/position_button"
+            android:id="@+id/title_position_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/tab_padding"
-            android:text="@string/position_tab"
+            android:layout_marginTop="@dimen/detail_title_margin"
+            android:text="@string/location_details_title"
             android:textAllCaps="true"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/tab_menu"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/history_button"
-            app:layout_constraintTop_toTopOf="@id/tab_menu" />
-
-        <TextView
-            android:id="@+id/history_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/tab_padding"
-            android:text="@string/history_tab"
-            android:textAllCaps="true"
-            android:textColor="@color/dark_green"
+            android:textSize="@dimen/detail_title_size"
             android:textStyle="bold"
-            android:background="@drawable/selected_tab"
-            app:layout_constraintBottom_toBottomOf="@id/tab_menu"
-            app:layout_constraintLeft_toRightOf="@id/position_button"
-            app:layout_constraintRight_toLeftOf="@id/graph_button"
-            app:layout_constraintTop_toTopOf="@id/tab_menu" />
+            app:layout_constraintHorizontal_bias="0.2"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/graph_button"
+            android:id="@+id/location_time_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/tab_padding"
-            android:text="@string/graph_tab"
-            android:textAllCaps="true"
+            android:layout_marginTop="@dimen/position_details"
+            android:text="@string/time_location_detail"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/tab_menu"
-            app:layout_constraintLeft_toRightOf="@id/history_button"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tab_menu" />
+            android:textSize="@dimen/saving_time"
+            app:layout_constraintLeft_toLeftOf="@id/title_position_detail"
+            app:layout_constraintTop_toBottomOf="@id/title_position_detail" />
+
+        <TextView
+            android:id="@+id/location_latitude_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/position_details"
+            android:text="@string/latitude_read_detail"
+            android:textColor="@color/black"
+            android:textSize="@dimen/saving_time"
+            app:layout_constraintLeft_toLeftOf="@id/title_position_detail"
+            app:layout_constraintTop_toBottomOf="@id/location_time_detail" />
+
+        <TextView
+            android:id="@+id/location_longitude_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/position_details"
+            android:text="@string/longitude_read_detail"
+            android:textColor="@color/black"
+            android:textSize="@dimen/saving_time"
+            app:layout_constraintLeft_toLeftOf="@id/title_position_detail"
+            app:layout_constraintTop_toBottomOf="@id/location_latitude_detail" />
+
+        <TextView
+            android:id="@+id/location_altitude_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/position_details"
+            android:text="@string/altitude_read_detail"
+            android:textColor="@color/black"
+            android:textSize="@dimen/saving_time"
+            app:layout_constraintLeft_toLeftOf="@id/title_position_detail"
+            app:layout_constraintTop_toBottomOf="@id/location_longitude_detail" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/number_element_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/num_of_element"
-        android:textColor="@color/black"
-        android:layout_below="@id/tab_menu"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:layout_centerHorizontal="true"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/locations_list"
-        android:layout_width="wrap_content"
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/number_element_label"
-        android:layout_centerHorizontal="true"
-        android:foregroundGravity="center"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_below="@id/div_title"
+        android:layout_toRightOf="@id/location_wrapper"
+        android:tag="googleMap"
+        tools:context=".MapsActivity" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/delete_all_locations"
+        android:id="@+id/back_to_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="40dp"
-        android:tag="@string/delete_locations"
-        android:backgroundTint="@color/red"
-        android:contentDescription="@string/delete_all_locations"
+        android:contentDescription="@string/back_button_description"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        app:srcCompat="@drawable/delete"/>
+        app:srcCompat="@drawable/arrow_back" />
+
 
 </RelativeLayout>
