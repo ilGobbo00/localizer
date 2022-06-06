@@ -1,4 +1,4 @@
-package com.unipd.localizer
+package it.unipd.localizer.tabs
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
@@ -15,16 +15,22 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.core.content.res.ResourcesCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
-import androidx.room.Room
 import com.google.android.gms.location.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
-import com.unipd.localizer.BackgroundLocation.Companion.BACKGROUND_SERVICE
-import com.unipd.localizer.MainActivity.Companion.PERMISSIONS
-import com.unipd.localizer.MainActivity.Companion.SERVICE_RUNNING
+import it.unipd.localizer.service.BackgroundLocation.Companion.BACKGROUND_SERVICE
+import it.unipd.localizer.MainActivity.Companion.PERMISSIONS
+import it.unipd.localizer.MainActivity.Companion.SERVICE_RUNNING
+import com.unipd.localizer.R
+import it.unipd.localizer.database.LocationDao
+import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.database.LocationsDatabase
+import it.unipd.localizer.database.SimpleLocationItem
+import it.unipd.localizer.service.BackgroundLocation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.ceil
@@ -63,9 +69,6 @@ class Position : Fragment() {
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
 
-//    private var permissionObtained = false
-//    private var locationsReading = false
-
     // Const values for persistentState and number of locations stored
     companion object {
         const val OLDEST_DATA = 1000 * 60 * 5                                       // Oldest Position: 5min old (millis)(considering 1 location/s)
@@ -73,7 +76,6 @@ class Position : Fragment() {
         val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())                // Max queue size
 
         const val BACKGROUND_RUNNING = "background_active"
-//        const val SWITCHING_TAB = "switching_tab"
     }
 
     @SuppressLint("MissingPermission")
@@ -82,7 +84,6 @@ class Position : Fragment() {
         val view = inflater.inflate(R.layout.position_page, container, false)
 
         // Reference to database repository
-//        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
         try {
             database = LocationsDatabase.getDatabase(requireContext())
         }catch (e: java.lang.IllegalStateException){
@@ -123,30 +124,15 @@ class Position : Fragment() {
                 Log.i("Localizer/P", "Request to RUN background service")
                 persistentStateEditor.putBoolean(BACKGROUND_RUNNING, true)
                 persistentStateEditor.apply()
-                backgroundService = true
-                backgroundButton.setImageResource(R.drawable.stop)
-                backgroundButton.backgroundTintList = ColorStateList.valueOf(Color.RED)
-                backgroundButton.tag = getString(R.string.running_service)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.starting_background_service),
-                    LENGTH_SHORT
-                ).show()
+                updateFAB()
+                Toast.makeText(requireContext(), getString(R.string.starting_background_service), LENGTH_SHORT ).show()
             } else {
                 // Stop background service
                 Log.i("Localizer/P", "Request to STOP background service")
                 persistentStateEditor.putBoolean(BACKGROUND_RUNNING, false)
                 persistentStateEditor.apply()
-                backgroundService = false
-                backgroundButton.setImageResource(R.drawable.start)
-                backgroundButton.backgroundTintList =
-                    ColorStateList.valueOf(resources.getColor(R.color.teal_200))
-                backgroundButton.tag = getString(R.string.service_not_running)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.stopping_background_service),
-                    LENGTH_SHORT
-                ).show()
+                updateFAB()
+                Toast.makeText(requireContext(), getString(R.string.stopping_background_service), LENGTH_SHORT ).show()
             }
         }
 
@@ -168,27 +154,6 @@ class Position : Fragment() {
             longitudeField?.text = savedInstanceState.getString("longitude")
             altitudeField?.text = savedInstanceState.getString("altitude")
         }
-
-//        val permissionObtained = persistentState.getBoolean(PERMISSIONS, false)
-
-//        Log.i("Localizer/P", "permissionObtained: $permissionObtained")
-//        if (!permissionObtained)
-//            if(getView() != null)
-//                Snackbar.make(requireView(), R.string.permissions_denied, LENGTH_LONG).show()
-//            return view
-
-
-/*        val locationPermissionRequest =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-                permissionObtained = true
-                for (permission in permissions) {
-                    Log.i("Localizer/Permissions", "Checking: $permission")
-                    permissionObtained = permissionObtained && permission.value
-                }
-                Log.i("Localizer/Permissions", "Checking permissions..")
-                if (permissionObtained) {
-                    Log.i("Localizer/Permissions", "Permission obtained")
-*/
 
         locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -231,37 +196,21 @@ class Position : Fragment() {
                 super.onLocationResult(locationResult)
             }
         }
-//        if(permissionObtained)
-//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, requireContext().mainLooper)
-//        else
-//            Snackbar.make(requireView(), R.string.permissions_denied, LENGTH_LONG).show()
-
-
-/*                }
-            }
-
-
-        if(!permissionObtained) {
-            Log.i("Localizer/Permissions", "Asking permissions")
-            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-                locationPermissionRequest.launch(arrayOf(Manifest.permission.FOREGROUND_SERVICE))
-        }else
-            Log.i("Localizer/Permissions", "Permissions already got")
-*/
 
         return view
     }
 
-//    @SuppressLint("MissingPermission")
     @SuppressLint("MissingPermission")
     override fun onResume() {
         Log.i("Localizer/P", "onResume")
 
 
-        if(!persistentState.getBoolean(PERMISSIONS, false))
+        if(!persistentState.getBoolean(PERMISSIONS, false)) {
             // Displayed if the user select to denied permissions in permissions window
             Snackbar.make(requireView(), R.string.permissions_denied, LENGTH_LONG).show()
+            persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
+            persistentStateEditor.apply()
+        }
         else{
             if(!persistentState.getBoolean(SERVICE_RUNNING, false)){
                 Log.i("Localizer/P", "Dentro locationReading")
@@ -285,20 +234,23 @@ class Position : Fragment() {
     private fun updateFAB() {
         Log.d("Localizer/P", "updateFAB")
         Log.d("Localizer/P", "Persistent state: $persistentState")
-        if (!persistentState.getBoolean(BACKGROUND_RUNNING, false))
-            return
-        Log.d("Localizer/P", "Persistent state data found")
-        backgroundService = true
-        backgroundButton.setImageResource(R.drawable.stop)
-        backgroundButton.backgroundTintList = ColorStateList.valueOf(Color.RED)
-        backgroundButton.tag = getString(R.string.running_service)
+        if (!persistentState.getBoolean(BACKGROUND_RUNNING, false)){
+            backgroundService = false
+            backgroundButton.setImageResource(R.drawable.start)
+            backgroundButton.backgroundTintList = ColorStateList.valueOf(getColor(resources,R.color.teal_200, null))
+            backgroundButton.tag = getString(R.string.service_not_running)
+        }else {
+            Log.d("Localizer/P", "Persistent state data found")
+            backgroundService = true
+            backgroundButton.setImageResource(R.drawable.stop)
+            backgroundButton.backgroundTintList = ColorStateList.valueOf(Color.RED)
+            backgroundButton.tag = getString(R.string.running_service)
+        }
     }
 
     @SuppressLint("MissingPermission")  // Already checked in Activity lifecycle
     override fun onStart() {
         Log.i("Localizer/P", "onStart")
-//        permissionObtained = persistentState.getBoolean(PERMISSIONS, false)
-//        Log.i("Localizer/P", "permissionObtained: $permissionObtained")
 
         // Pause background service when the position fragment is displayed. Resume later
         val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
@@ -339,42 +291,10 @@ class Position : Fragment() {
             backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
             backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
             requireContext().startService(backgroundIntent)
-            //onPaused caused by exiting the app
-            // Stop the current position updating
-//            if(this::locationCallback.isInitialized)
-//                fusedLocationClient.removeLocationUpdates(locationCallback)
         }
-
-            /* If user enable background service start it
-            if (backgroundService) {
-                Log.d("Localizer/Lifecycle", "OnPause --> try to start service")
-                val backgroundIntent =
-                    Intent(activity?.applicationContext, BackgroundLocation::class.java)
-                backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
-                backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
-                requireContext().startService(backgroundIntent)
-            }
-        }else{
-             If user enable background service start it
-            if (backgroundService) {
-                Log.d("Localizer/Lifecycle", "OnPause --> try to start service")
-                val backgroundIntent =
-                    Intent(activity?.applicationContext, BackgroundLocation::class.java)
-                backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
-                backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
-                requireContext().startService(backgroundIntent)
-        }
-         else current position updating can continue*/
-
-
-
 
         super.onStop()
     }
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-//    }
 }
 
 

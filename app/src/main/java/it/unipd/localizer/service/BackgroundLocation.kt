@@ -1,31 +1,28 @@
-package com.unipd.localizer
+package it.unipd.localizer.service
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.room.Room
 import com.google.android.gms.location.*
-import com.unipd.localizer.MainActivity.Companion.PERMISSIONS
-import kotlinx.coroutines.Dispatchers
+import it.unipd.localizer.MainActivity.Companion.PERMISSIONS
+import com.unipd.localizer.R
+import it.unipd.localizer.MainActivity
+import it.unipd.localizer.database.LocationDao
+import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.database.LocationsDatabase
+import it.unipd.localizer.database.SimpleLocationItem
+import it.unipd.localizer.tabs.Position
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class BackgroundLocation : Service() {
     private var serviceActiveNewRequest = false
-//    private var serviceActiveOldRequest = false
     private var permissionsObtained = false
 
     private val locationCallback = object : LocationCallback() {
@@ -56,9 +53,7 @@ class BackgroundLocation : Service() {
         }
     }
 
-
     // Database variables/values
-//    private lateinit var referenceLocationRepo: ReferenceLocationRepo
     private lateinit var database : LocationsDatabase
     private lateinit var dbManager : LocationDao
 
@@ -66,8 +61,6 @@ class BackgroundLocation : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var currentLocation: SimpleLocationItem
 
-//    private lateinit var persistentState: SharedPreferences
-//    private lateinit var persistentStateEditor: SharedPreferences.Editor
 
     companion object {
         const val BACKGROUND_SERVICE = "background_service"
@@ -105,10 +98,7 @@ class BackgroundLocation : Service() {
         Log.d("Localizer/Background", "onStartCommand")
         permissionsObtained = intent?.getBooleanExtra(PERMISSIONS, false) ?: false
         serviceActiveNewRequest = intent?.getBooleanExtra(BACKGROUND_SERVICE, false) ?: false
-//        Log.d("Localizer/Background", "oldRequest: $serviceActiveOldRequest, newRequest: $serviceActiveNewRequest")
-        // TODO da controllare la logica
-        if(/*!serviceActiveOldRequest &&*/ serviceActiveNewRequest && permissionsObtained) {
-//            serviceActiveOldRequest = serviceActiveNewRequest
+        if(serviceActiveNewRequest && permissionsObtained) {
             backgroundLocalizer()
         }
         return START_REDELIVER_INTENT
@@ -116,15 +106,8 @@ class BackgroundLocation : Service() {
 
     @SuppressLint("MissingPermission") // If here permissions are already obtained
     private fun backgroundLocalizer(){
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-//            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-//            ActivityCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE ) != PackageManager.PERMISSION_GRANTED ) {
-//            return
-//        }
         Log.d("Localizer/Background", "Permissions obtained, start backgroundLocalizer")
 
-//        database = Room.databaseBuilder(applicationContext, LocationsDatabase::class.java, "locations").build()
         try {
             database = LocationsDatabase.getDatabase(applicationContext)
         }catch (e: java.lang.IllegalStateException){
@@ -144,9 +127,10 @@ class BackgroundLocation : Service() {
         val notificationBuilder: Notification.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder = Notification.Builder(applicationContext, CHANNEL_ID)
-            notificationBuilder.setContentTitle(getString(R.string.app_name))
-            notificationBuilder.setContentText(getString(R.string.app_description))
-            notificationBuilder.setSmallIcon(R.drawable.temp_notification_icon)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.app_description))
+                .setSmallIcon(R.drawable.temp_notification_icon)
+
             val notification = notificationBuilder.build()
             val notificationID = 1224272
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)

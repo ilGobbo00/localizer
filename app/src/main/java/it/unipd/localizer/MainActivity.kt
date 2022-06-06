@@ -1,18 +1,13 @@
-package com.unipd.localizer
+package it.unipd.localizer
 
 import android.Manifest
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.os.persistableBundleOf
-import androidx.room.Room
-import com.google.android.gms.location.LocationCallback
+import com.unipd.localizer.R
 
 class MainActivity : AppCompatActivity() {
     private lateinit var persistentState: SharedPreferences

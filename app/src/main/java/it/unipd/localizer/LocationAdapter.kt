@@ -1,4 +1,4 @@
-package com.unipd.localizer
+package it.unipd.localizer
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,15 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.unipd.localizer.Details.Companion.SHOW_DETAILS
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.sql.Timestamp
+import com.unipd.localizer.R
+import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.tabs.HistoryDirections
+import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS
 import java.text.SimpleDateFormat
-import kotlin.coroutines.coroutineContext
 
 class LocationAdapter(private val locationList: List<LocationEntity>, private val activity: FragmentActivity?) :
 RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){

@@ -8,4 +8,4 @@
     android:name="androidx.navigation.fragment.NavHostFragment"
     app:navGraph="@navigation/tab_navigation"
     app:defaultNavHost="true"
-    tools:context=".MainActivity"/>
+    tools:context="it.unipd.localizer.MainActivity"/>

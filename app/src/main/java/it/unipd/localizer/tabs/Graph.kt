@@ -1,4 +1,4 @@
-package com.unipd.localizer
+package it.unipd.localizer.tabs
 
 import android.content.Context
 import android.content.Intent
@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.github.mikephil.charting.charts.LineChart
@@ -21,7 +22,13 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.unipd.localizer.Position.Companion.BACKGROUND_RUNNING
+import com.unipd.localizer.*
+import it.unipd.localizer.database.LocationDao
+import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.database.LocationsDatabase
+import it.unipd.localizer.database.SimpleLocationItem
+import it.unipd.localizer.service.BackgroundLocation
+import it.unipd.localizer.tabs.Position.Companion.BACKGROUND_RUNNING
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -181,10 +188,10 @@ class Graph : Fragment(){
     }
 
     private fun dataAddStyles(data: LineDataSet){
-        data.setCircleColor(resources.getColor(R.color.teal_700))
-        data.setColors(Color.CYAN)
+        data.setCircleColor(getColor(resources, R.color.teal_700, null))
         data.setDrawCircles(false)
         data.setDrawValues(false)
+//        data.setColors(Color.CYAN)
     }
 
     override fun onPause() {

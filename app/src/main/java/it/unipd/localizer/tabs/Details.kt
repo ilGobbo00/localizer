@@ -1,4 +1,4 @@
-package com.unipd.localizer
+package it.unipd.localizer.tabs
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,19 +15,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.findFragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import androidx.room.Room
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
+import com.unipd.localizer.R
+import it.unipd.localizer.database.LocationDao
+import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.database.LocationsDatabase
+import it.unipd.localizer.service.BackgroundLocation
 //import com.unipd.localizer.databinding.LocationDetailBinding
 //import com.unipd.localizer.databinding.PositionPageBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.IllegalStateException

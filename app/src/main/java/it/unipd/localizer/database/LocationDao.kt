@@ -1,10 +1,7 @@
-package com.unipd.localizer
+package it.unipd.localizer.database
 
-import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.unipd.localizer.Position.Companion.OLDEST_DATA
-import java.sql.Timestamp
+import it.unipd.localizer.tabs.Position.Companion.OLDEST_DATA
 import java.util.*
 
 // LocationDao provides the methods that the rest of the app uses to interact with data in the locations table

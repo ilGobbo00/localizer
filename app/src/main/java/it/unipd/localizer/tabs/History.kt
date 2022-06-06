@@ -1,4 +1,4 @@
-package com.unipd.localizer
+package it.unipd.localizer.tabs
 
 import android.content.Context
 import android.content.Intent
@@ -17,10 +17,8 @@ import android.widget.TextView
 //import android.widget.Toast
 //import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -32,8 +30,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
-import com.unipd.localizer.Details.Companion.SHOW_DETAILS
-import com.unipd.localizer.Position.Companion.BACKGROUND_RUNNING
+import com.unipd.localizer.*
+import it.unipd.localizer.database.LocationDao
+import it.unipd.localizer.LocationAdapter
+import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.database.LocationsDatabase
+import it.unipd.localizer.service.BackgroundLocation
+import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS
+import it.unipd.localizer.tabs.Position.Companion.BACKGROUND_RUNNING
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 

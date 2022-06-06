@@ -1,11 +1,9 @@
-package com.unipd.localizer
+package it.unipd.localizer.database
 
-import android.location.Location
 import android.util.Log
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import java.io.ByteArrayOutputStream
 
 class Converters {
     @TypeConverter

@@ -156,12 +156,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--    <androidx.constraintlayout.widget.Guideline-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--        app:layout_constraintGuide_begin="320dp" />-->
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/position_body"
         android:layout_width="match_parent"
@@ -315,28 +309,12 @@
         android:id="@+id/start_stop_background_service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginEnd="@dimen/fab_margin_right"
+        android:layout_marginBottom="@dimen/fab_margin_bottom"
         android:tag="@string/service_not_running"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/start"
         android:contentDescription="@string/start_background_service"/>
-
-<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--        android:id="@+id/stop_background"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="bottom|end"-->
-<!--        android:layout_marginEnd="30dp"-->
-<!--        android:layout_marginBottom="40dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:srcCompat="@drawable/stop"-->
-<!--        android:contentDescription="@string/stop_backgound_service"-->
-<!--        app:backgroundTint="@color/red"/>-->
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

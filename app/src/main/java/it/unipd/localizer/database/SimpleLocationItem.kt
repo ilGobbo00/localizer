@@ -1,4 +1,4 @@
-package com.unipd.localizer
+package it.unipd.localizer.database
 
 import java.sql.Timestamp
 
