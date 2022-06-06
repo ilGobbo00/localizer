@@ -59,8 +59,7 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
     override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
         val locationStringList = mutableListOf<String>()
         for(location in locationList)
-            locationStringList.add(SimpleDateFormat("dd-MM-yyyy kk:mm:ss.SSS").format(location.timeStamp)/*Timestamp(location.timeStamp).toString()*/)      // TODO provare dd-mm-yyyy hh-mm-ss
-//        val locationList = locationDao.getAllLocationsStringTimestamp()         // TODO Probabilmente crasha
+            locationStringList.add(SimpleDateFormat("dd-MM-yyyy kk:mm:ss.SSS").format(location.timeStamp))
         holder.bind(locationStringList[position])
     }
 }

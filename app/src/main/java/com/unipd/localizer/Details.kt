@@ -42,6 +42,7 @@ class Details:Fragment(), OnMapReadyCallback {
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
 
+
     private var backButton: FloatingActionButton? = null
 
 //    private lateinit var referenceLocationRepo: ReferenceLocationRepo
@@ -97,10 +98,6 @@ class Details:Fragment(), OnMapReadyCallback {
         }
 
         // Reference to labels
-//        time = binding.locationTimeDetail
-//        latitude = binding.locationLatitudeDetail
-//        longitude = binding.locationLongitudeDetail
-//        altitude = binding.locationAltitudeDetail
         time = view?.findViewById(R.id.location_time_detail)
         latitude = view?.findViewById(R.id.location_latitude_detail)
         longitude = view?.findViewById(R.id.location_longitude_detail)
@@ -140,7 +137,6 @@ class Details:Fragment(), OnMapReadyCallback {
 
             }
 
-//            Log.d("CoExecution", "Location got from db: ${referenceLocationRepo.getLocation(timestamp)}")
         }
         if(this::mapFragment.isInitialized)
             mapFragment.getMapAsync(this)
@@ -162,8 +158,6 @@ class Details:Fragment(), OnMapReadyCallback {
             altitude?.text = ""
             return view
         }
-
-
 
         Log.d("Execution", "Return from Detail")
         return view
@@ -194,7 +188,6 @@ class Details:Fragment(), OnMapReadyCallback {
             val location = LatLng(locationToDisplay!!.location.latitude, locationToDisplay!!.location.longitude)
             map.addMarker(MarkerOptions().position(location).title("Location"))
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
-//            map.animateCamera(CameraUpdateFactory.zoomTo(15f), 1000, null)
         }
     }
 

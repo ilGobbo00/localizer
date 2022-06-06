@@ -122,8 +122,6 @@ class Graph : Fragment(){
         val dataSetChart2: LineDataSet
         when(resources.configuration.orientation){
            ORIENTATION_PORTRAIT -> {
-               chart1Title.text = getString(R.string.locations_chart_title)
-               chart2Title.text = getString(R.string.altitudes_chart_title)
                var nextLoc: SimpleLocationItem
                for(i in IntRange(0, locationsList.size-2) ) {
                    // Location 1
@@ -142,8 +140,6 @@ class Graph : Fragment(){
                dataSetChart2 = LineDataSet(entriesChart2, "Altitude trend [m]")
            }
             else -> {
-                chart1Title.text = getString(R.string.latitude)
-                chart2Title.text = getString(R.string.longitude)
                 for(i in IntRange(0, locationsList.size-1)) {
                     currentLoc = locationsList[i].location
 
@@ -182,8 +178,6 @@ class Graph : Fragment(){
         chart.setPinchZoom(true)
         val xAxis = chart.xAxis
         xAxis.isEnabled = false
-//        xAxis.position = XAxis.XAxisPosition.BOTTOM
-//        xAxis.removeAllLimitLines()
     }
 
     private fun dataAddStyles(data: LineDataSet){

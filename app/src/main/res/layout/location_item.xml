@@ -12,6 +12,7 @@
         android:layout_gravity="center"
         android:padding="@dimen/label_padding"
         android:text="@string/invalid_position_label"
+        android:textAlignment="center"
         android:textSize="20sp"
         android:textColor="@color/black"
         android:background="@color/white"/>
