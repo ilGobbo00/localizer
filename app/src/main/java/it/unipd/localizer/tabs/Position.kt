@@ -50,15 +50,15 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     // Flag used to start/stop requestLocationUpdates
     private var switchingTabs = false
-    private var orientationChanged = false
+//    private var orientationChanged = false
 
     // Background service button
     private lateinit var backgroundButton: FloatingActionButton
 
     // Variables for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-//    private lateinit var locationRequest: LocationRequest
-//    private lateinit var locationCallback: LocationCallback
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
 
     private lateinit var currentLocation: SimpleLocationItem
     private var latitudeField: TextView? = null
@@ -94,9 +94,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
         const val ALTITUDE= "altitude"
-
-        private lateinit var locationRequest: LocationRequest
-        private lateinit var locationCallback: LocationCallback
     }
 
     @SuppressLint("MissingPermission")
@@ -174,10 +171,11 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
                 Toast.makeText(requireContext(), getString(R.string.stopping_background_service), LENGTH_SHORT ).show()
             }
         }
-        backgroundButton.setOnLongClickListener(OnLongClickListener {
-                Toast.makeText(context, getString(R.string.background_button_hint), LENGTH_SHORT).show()
-                true
-            })
+        backgroundButton.setOnLongClickListener {
+            Toast.makeText(context, getString(R.string.background_button_hint), LENGTH_SHORT)
+                .show()
+            true
+        }
 
         // Try to create a fusedLocationClient
         try {
@@ -278,7 +276,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     @SuppressLint("MissingPermission")          // Already checked in Activity lifecycle
     override fun onResume() {
-        Log.i("Localizer/P", "onResume. Current orientation flag: $orientationChanged. Permissions: ${persistentState.getBoolean(PERMISSIONS, false)}")
+        Log.i("Localizer/P", "onResume. Permissions: ${persistentState.getBoolean(PERMISSIONS, false)}")
 
         // If permissions have been revoked during app lifecycle
         if(!persistentState.getBoolean(PERMISSIONS, false)) {
@@ -311,17 +309,21 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     }
 
     override fun onStop() {
-        Log.i("Localizer/P", "OnStop. locationCallBack = ${locationCallback}, orientationChanged = $orientationChanged")
+        Log.i("Localizer/P", "OnStop. locationCallBack = $locationCallback")
 
         // If user either exits from the app or change tab, stop main localizer service
-        if(!orientationChanged || switchingTabs || (!switchingTabs && backgroundService)) {
+        /*if(*//*!orientationChanged || *//*switchingTabs || (!switchingTabs && backgroundService)) {
             fusedLocationClient.removeLocationUpdates(locationCallback)
             persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
             Log.i("Localizer/P", "requestLocationUpdates removed")
-        }
+        }*/
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
 
         // If user change main tab or exits after asking "background" service, enable foreground service
         if(switchingTabs || (!switchingTabs && backgroundService)) {
+            Log.i("Localizer/P", "requestLocationUpdates removed")
+
             // If user enable background service start it
             Log.d("Localizer/P", "onStop, start foreground service")
             val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
@@ -331,7 +333,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         }
 
         // If user exit from the app, remove last location data read, else save its fields
-        if(!switchingTabs && !orientationChanged){
+        if(!switchingTabs/* && !orientationChanged*/){
             Log.i("Localizer/P", "Removing currentLocation stored data")
             persistentStateEditor.remove(LATITUDE)
             persistentStateEditor.remove(LONGITUDE)
@@ -372,7 +374,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         try {
             Navigation.findNavController(requireView()).navigate(destinationTab)
         }catch (e: java.lang.IllegalStateException){}
-        orientationChanged = true
+//        orientationChanged = true
     }
 
     // Function called on Number Picker scroll
