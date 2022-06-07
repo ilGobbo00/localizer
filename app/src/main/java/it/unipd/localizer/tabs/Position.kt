@@ -13,6 +13,7 @@ import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.TextView
@@ -25,7 +26,6 @@ import com.google.android.gms.location.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
-import it.unipd.localizer.service.BackgroundLocation.Companion.BACKGROUND_SERVICE
 import it.unipd.localizer.MainActivity.Companion.PERMISSIONS
 import it.unipd.localizer.MainActivity.Companion.SERVICE_RUNNING
 import it.unipd.localizer.R
@@ -34,10 +34,9 @@ import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
 import it.unipd.localizer.database.SimpleLocationItem
 import it.unipd.localizer.service.BackgroundLocation
+import it.unipd.localizer.service.BackgroundLocation.Companion.BACKGROUND_SERVICE
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.text.SimpleDateFormat
-import kotlin.math.ceil
 
 
 class Position : Fragment(), NumberPicker.OnValueChangeListener {
@@ -58,8 +57,8 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     // Variables for position
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
-    private lateinit var locationCallback: LocationCallback
+//    private lateinit var locationRequest: LocationRequest
+//    private lateinit var locationCallback: LocationCallback
 
     private lateinit var currentLocation: SimpleLocationItem
     private var latitudeField: TextView? = null
@@ -73,7 +72,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
 
-    private lateinit var minute_selector: NumberPicker
+    private lateinit var minuteSelector: NumberPicker
 
     private lateinit var maxNumLabel: TextView
 
@@ -92,10 +91,18 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         const val REFRESH_TIME = 1000                                               // Read position every 1s
         const val BACKGROUND_RUNNING = "background_active"
         const val MAX_MINUTE = "max_minute"
+        const val LATITUDE = "latitude"
+        const val LONGITUDE = "longitude"
+        const val ALTITUDE= "altitude"
+
+        private lateinit var locationRequest: LocationRequest
+        private lateinit var locationCallback: LocationCallback
     }
 
     @SuppressLint("MissingPermission")
-    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
+    override fun onCreateView( inflater: LayoutInflater,
+                               container: ViewGroup?,
+                               savedInstanceState: Bundle? ): View? {
         Log.i("Localizer/P", "OnCreateView")
         val view = inflater.inflate(R.layout.position_page, container, false)
 
@@ -119,26 +126,24 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         backgroundButton = view.findViewById(R.id.start_stop_background_service)
 
         // Number picker
-        minute_selector = view.findViewById(R.id.minute_selector)
-        minute_selector.setOnValueChangedListener(this)
-        minute_selector.minValue = 1
-        minute_selector.maxValue = 10
-        minute_selector.value = persistentState.getInt(MAX_MINUTE,5)
+        minuteSelector = view.findViewById(R.id.minute_selector)
+        minuteSelector.setOnValueChangedListener(this)
+        minuteSelector.minValue = 1
+        minuteSelector.maxValue = 10
+        minuteSelector.value = persistentState.getInt(MAX_MINUTE,5)
 
         // Update max stored data age
         OLDEST_DATA = persistentState.getInt(MAX_MINUTE, 5)
 
         // Update label with current data
         maxNumLabel = view.findViewById(R.id.max_size)
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             maxNumLabel.text = Html.fromHtml(getString(R.string.max_num_stored, MAX_SIZE), Html.FROM_HTML_MODE_LEGACY)
         else
             maxNumLabel.text = getString(R.string.max_num_stored, MAX_SIZE)
 
-        // Update FAB based on background service status
-        updateFAB()
+//        // Update FAB based on background service status
+//        updateFAB()
 
         // Set buttons actions
         switchingTabs = false
@@ -169,8 +174,12 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
                 Toast.makeText(requireContext(), getString(R.string.stopping_background_service), LENGTH_SHORT ).show()
             }
         }
+        backgroundButton.setOnLongClickListener(OnLongClickListener {
+                Toast.makeText(context, getString(R.string.background_button_hint), LENGTH_SHORT).show()
+                true
+            })
 
-
+        // Try to create a fusedLocationClient
         try {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         } catch (e: IllegalStateException) {
@@ -184,14 +193,11 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         longitudeField = view.findViewById(R.id.longitude_field)
         altitudeField = view.findViewById(R.id.altitude_field)
 
-        if (persistentState.getString("latitude", null) != null) {
-            latitudeField?.text = persistentState.getString("latitude", "")
-            longitudeField?.text = persistentState.getString("longitude", "")
-            altitudeField?.text = persistentState.getString("altitude", "")
-
-//            persistentStateEditor.remove("latitude")
-//            persistentStateEditor.remove("longitude")
-//            persistentStateEditor.remove("altitude")
+        // Show details of last location read
+        if (persistentState.getString(LATITUDE, null) != null) {
+            latitudeField?.text = persistentState.getString(LATITUDE, "Invalid data")
+            longitudeField?.text = persistentState.getString(LONGITUDE, "Invalid data")
+            altitudeField?.text = persistentState.getString(ALTITUDE, "Invalid data")
         }
 
         locationRequest = LocationRequest.create()
@@ -233,7 +239,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
                     launch {
                         // Check if it's necessary deleting data
                         val locationList = dbManager.getAllLocations()
-                        Log.i("Localizer/P", "OLDEST: ${OLDEST_DATA/1000/60} - MAX_SIZE: $MAX_SIZE")
                         if (locationList.size > MAX_SIZE)
                             dbManager.deleteOld()
                     }
@@ -245,40 +250,101 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         return view
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onResume() {
-        Log.i("Localizer/P", "onResume")
+    @SuppressLint("MissingPermission")  // Already checked in Activity lifecycle
+    override fun onStart() {
+        Log.i("Localizer/P", "onStart")
 
+        // Stop foreground service when the position fragment is displayed. Can be resumed later
+        val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
+        backgroundIntent.putExtra(BACKGROUND_SERVICE, false)
+        requireContext().stopService(backgroundIntent)              // Nothing happened if service isn't running
 
-        if(!persistentState.getBoolean(PERMISSIONS, false)) {
-            // Displayed if the user select to denied permissions in permissions window
-            Snackbar.make(requireView(), R.string.permissions_denied, LENGTH_LONG).show()
-            persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
-            persistentStateEditor.apply()
-        }
-        else{
+        Log.i("Localizer/P", "onStart, permissions = ${persistentState.getBoolean(PERMISSIONS, false)}, main service active = ${persistentState.getBoolean(SERVICE_RUNNING, false)}")
+
+        // If the app has permissions and isn't already running, start requesting locations
+        if(persistentState.getBoolean(PERMISSIONS, false)){
             if(!persistentState.getBoolean(SERVICE_RUNNING, false)){
-                Log.i("Localizer/P", "Dentro locationReading")
+                Log.i("Localizer/P","Start requestLocationUpdates onStart")
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, requireContext().mainLooper)
+                persistentStateEditor.putBoolean(SERVICE_RUNNING, true)
+            }
+        }else
+            persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
+
+        persistentStateEditor.apply()
+
+        super.onStart()
+    }
+
+    @SuppressLint("MissingPermission")          // Already checked in Activity lifecycle
+    override fun onResume() {
+        Log.i("Localizer/P", "onResume. Current orientation flag: $orientationChanged. Permissions: ${persistentState.getBoolean(PERMISSIONS, false)}")
+
+        // If permissions have been revoked during app lifecycle
+        if(!persistentState.getBoolean(PERMISSIONS, false)) {
+            // Display permissions snackbar
+            Snackbar.make(requireView(), R.string.permissions_denied, LENGTH_LONG).show()
+//            persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
+//            persistentStateEditor.apply()
+        }else{
+            // Block used only the first time permissions are asked (otherwise service doesn't start)
+            // If app has permissions but main service isn't running, run it
+            if(!persistentState.getBoolean(SERVICE_RUNNING, false)){
+                Log.i("Localizer/P","Start requestLocationUpdates onResume")
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, requireContext().mainLooper)
                 persistentStateEditor.putBoolean(SERVICE_RUNNING, true)
                 persistentStateEditor.apply()
             }
+
+
         }
-//        if(persistentState.getBoolean(PERMISSIONS, false) && /*this::fusedLocationClient.isInitialized && */this::locationRequest.isInitialized/* && this::locationCallback.isInitialized*/)
-//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback,requireContext().mainLooper)
+
+        // Update FAB based on background service status
+        updateFAB()
+
         super.onResume()
     }
 
-    override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        savedInstanceState.putString("latitude", latitudeField?.text.toString())
-        savedInstanceState.putString("longitude", longitudeField?.text.toString())
-        savedInstanceState.putString("altitude", altitudeField?.text.toString())
-        super.onSaveInstanceState(savedInstanceState)
+    override fun onPause() {
+        Log.i("Localizer/P", "onPause")
+        super.onPause()
     }
 
+    override fun onStop() {
+        Log.i("Localizer/P", "OnStop. locationCallBack = ${locationCallback}, orientationChanged = $orientationChanged")
+
+        // If user either exits from the app or change tab, stop main localizer service
+        if(!orientationChanged || switchingTabs || (!switchingTabs && backgroundService)) {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+            persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
+            Log.i("Localizer/P", "requestLocationUpdates removed")
+        }
+
+        // If user change main tab or exits after asking "background" service, enable foreground service
+        if(switchingTabs || (!switchingTabs && backgroundService)) {
+            // If user enable background service start it
+            Log.d("Localizer/P", "onStop, start foreground service")
+            val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
+            backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
+            backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
+            requireContext().startService(backgroundIntent)
+        }
+
+        // If user exit from the app, remove last location data read, else save its fields
+        if(!switchingTabs && !orientationChanged){
+            Log.i("Localizer/P", "Removing currentLocation stored data")
+            persistentStateEditor.remove(LATITUDE)
+            persistentStateEditor.remove(LONGITUDE)
+            persistentStateEditor.remove(ALTITUDE)
+        }
+        persistentStateEditor.apply()
+
+        super.onStop()
+    }
+
+    // Update fab button based on foreground service status
     private fun updateFAB() {
         Log.d("Localizer/P", "updateFAB")
-        Log.d("Localizer/P", "Persistent state: $persistentState")
         if (!persistentState.getBoolean(BACKGROUND_RUNNING, false)){
             backgroundService = false
             backgroundButton.setImageResource(R.drawable.start)
@@ -293,35 +359,15 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         }
     }
 
-    @SuppressLint("MissingPermission")  // Already checked in Activity lifecycle
-    override fun onStart() {
-        Log.i("Localizer/P", "onStart")
-
-        // Pause background service when the position fragment is displayed. Resume later
-        val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
-        backgroundIntent.putExtra(BACKGROUND_SERVICE, false)
-        requireContext().stopService(backgroundIntent)
-
-        // If the app has permissions, when opened start reading locations
-        if(persistentState.getBoolean(PERMISSIONS, false)){
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, requireContext().mainLooper)
-            persistentStateEditor.putBoolean(SERVICE_RUNNING, true)
-        }else
-            persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
-
-        persistentStateEditor.apply()
-
-
-
-        super.onStart()
-    }
-
+    // Function called on phone rotation
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        persistentStateEditor.putString("latitude", currentLocation.latitude.toString())
-        persistentStateEditor.putString("longitude", currentLocation.longitude.toString())
-        persistentStateEditor.putString("altitude", currentLocation.altitude.toString())
-        persistentStateEditor.apply()
+        if(this::currentLocation.isInitialized) {
+            persistentStateEditor.putString(LATITUDE, currentLocation.latitude.toString())
+            persistentStateEditor.putString(LONGITUDE, currentLocation.longitude.toString())
+            persistentStateEditor.putString(ALTITUDE, currentLocation.altitude.toString())
+            persistentStateEditor.apply()
+        }
         val destinationTab = PositionDirections.actionPositionPageToPositionPage()
         try {
             Navigation.findNavController(requireView()).navigate(destinationTab)
@@ -329,29 +375,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         orientationChanged = true
     }
 
-    override fun onStop() {
-        Log.d("Localizer/Lifecycle", "OnPause")
-        if(this::locationCallback.isInitialized && !orientationChanged)
-            fusedLocationClient.removeLocationUpdates(locationCallback)
-
-        persistentStateEditor.remove("latitude")
-        persistentStateEditor.remove("longitude")
-        persistentStateEditor.remove("altitude")
-
-        if(switchingTabs || (!switchingTabs && backgroundService)) {
-
-            // If user enable background service start it
-            Log.d("Localizer/Lifecycle", "OnPause --> try to start service")
-            val backgroundIntent =
-                Intent(activity?.applicationContext, BackgroundLocation::class.java)
-            backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
-            backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
-            requireContext().startService(backgroundIntent)
-        }
-
-        super.onStop()
-    }
-
+    // Function called on Number Picker scroll
     override fun onValueChange(numPicker: NumberPicker?, old: Int, new: Int) {
         // Update maximum stored data age
         OLDEST_DATA = new                               // Custom setter on OLDEST_DATA

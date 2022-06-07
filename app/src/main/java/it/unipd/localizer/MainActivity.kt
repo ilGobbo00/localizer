@@ -1,12 +1,16 @@
 package it.unipd.localizer
 
 import android.Manifest
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.SharedPreferences
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
     private lateinit var persistentState: SharedPreferences
@@ -31,14 +35,21 @@ class MainActivity : AppCompatActivity() {
         persistentStateEditor = persistentState.edit()
 
         val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            permissionObtained = true
-            for (permission in permissions) {
-                Log.i("Localizer/MA", "Checking: ${permission.key} -> ${permission.value}")
-                permissionObtained = permissionObtained && permission.value
-            }
+//            permissionObtained = true
+//
+//            for (permission in permissions) {
+//                Log.i("Localizer/MA", "Checking: ${permission.key} -> ${permission.value}")
+//                permissionObtained = permissionObtained && permission.value
+//            }
+
+            permissionObtained = ContextCompat.checkSelfPermission(applicationContext, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(applicationContext, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED
 
             persistentStateEditor.putBoolean(PERMISSIONS, permissionObtained)
             persistentStateEditor.apply()
+
+            if(!permissionObtained)
+                persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
         }
 
         if(!permissionObtained) {

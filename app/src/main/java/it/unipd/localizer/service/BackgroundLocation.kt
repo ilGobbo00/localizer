@@ -45,7 +45,6 @@ class BackgroundLocation : Service() {
                 }
                 launch {
                     val locationList = dbManager.getAllLocations()
-                    Log.i("Localizer/P", "OLDEST: ${Position.OLDEST_DATA /1000/60} - MAX_SIZE: ${Position.MAX_SIZE}")
                     if (locationList.size > Position.MAX_SIZE)
                         dbManager.deleteOld()
                 }
