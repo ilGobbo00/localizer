@@ -21,6 +21,11 @@
             android:id="@+id/action_positionPage_to_graphPage"
             app:destination="@id/graphPage"
             app:popUpTo="@id/graphPage"/>
+        <action
+            android:id="@+id/action_positionPage_to_positionPage"
+            app:destination="@id/positionPage"
+            app:popUpTo="@id/positionPage"/>
+
     </fragment>
 
     <fragment

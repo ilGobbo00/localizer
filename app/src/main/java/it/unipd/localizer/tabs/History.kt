@@ -14,8 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-//import android.widget.Toast
-//import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
@@ -30,9 +28,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
-import com.unipd.localizer.*
 import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.LocationAdapter
+import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
 import it.unipd.localizer.service.BackgroundLocation

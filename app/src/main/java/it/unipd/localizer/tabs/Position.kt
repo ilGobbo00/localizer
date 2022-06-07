@@ -7,11 +7,14 @@ import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
@@ -25,7 +28,7 @@ import com.google.android.material.snackbar.Snackbar
 import it.unipd.localizer.service.BackgroundLocation.Companion.BACKGROUND_SERVICE
 import it.unipd.localizer.MainActivity.Companion.PERMISSIONS
 import it.unipd.localizer.MainActivity.Companion.SERVICE_RUNNING
-import com.unipd.localizer.R
+import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
@@ -33,10 +36,11 @@ import it.unipd.localizer.database.SimpleLocationItem
 import it.unipd.localizer.service.BackgroundLocation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.text.SimpleDateFormat
 import kotlin.math.ceil
 
 
-class Position : Fragment() {
+class Position : Fragment(), NumberPicker.OnValueChangeListener {
     // Database variables/values
     private lateinit var database: LocationsDatabase
     private lateinit var dbManager: LocationDao
@@ -69,13 +73,25 @@ class Position : Fragment() {
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
 
+    private lateinit var minute_selector: NumberPicker
+
+    private lateinit var maxNumLabel: TextView
+
     // Const values for persistentState and number of locations stored
     companion object {
-        const val OLDEST_DATA = 1000 * 60 * 5                                       // Oldest Position: 5min old (millis)(considering 1 location/s)
-        const val REFRESH_TIME = 1000                                               // Read position every 1s
-        val MAX_SIZE = ceil((OLDEST_DATA / REFRESH_TIME).toDouble())                // Max queue size
+        var MAX_SIZE = 1
+            get() {
+                field =  (OLDEST_DATA / REFRESH_TIME)                // Max queue size
+                return field
+            }
+        var OLDEST_DATA: Int = 5 * 60 * 1000                                       // Oldest Position: 5min old (millis)(considering 1 location/s)
+            set(value) {
+                field = value * 60 * 1000
+            }
 
+        const val REFRESH_TIME = 1000                                               // Read position every 1s
         const val BACKGROUND_RUNNING = "background_active"
+        const val MAX_MINUTE = "max_minute"
     }
 
     @SuppressLint("MissingPermission")
@@ -97,11 +113,29 @@ class Position : Fragment() {
         persistentState = requireActivity().getPreferences(MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
-
-        // Find buttons references
+        // Tabs references
         historyButton = view.findViewById(R.id.history_button)
         graphButton = view.findViewById(R.id.graph_button)
         backgroundButton = view.findViewById(R.id.start_stop_background_service)
+
+        // Number picker
+        minute_selector = view.findViewById(R.id.minute_selector)
+        minute_selector.setOnValueChangedListener(this)
+        minute_selector.minValue = 1
+        minute_selector.maxValue = 10
+        minute_selector.value = persistentState.getInt(MAX_MINUTE,5)
+
+        // Update max stored data age
+        OLDEST_DATA = persistentState.getInt(MAX_MINUTE, 5)
+
+        // Update label with current data
+        maxNumLabel = view.findViewById(R.id.max_size)
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            maxNumLabel.text = Html.fromHtml(getString(R.string.max_num_stored, MAX_SIZE), Html.FROM_HTML_MODE_LEGACY)
+        else
+            maxNumLabel.text = getString(R.string.max_num_stored, MAX_SIZE)
 
         // Update FAB based on background service status
         updateFAB()
@@ -145,14 +179,19 @@ class Position : Fragment() {
             return view
         }
 
+        // Get reference to location fields
         latitudeField = view.findViewById(R.id.latitude_field)
         longitudeField = view.findViewById(R.id.longitude_field)
         altitudeField = view.findViewById(R.id.altitude_field)
 
-        if (savedInstanceState != null) {
-            latitudeField?.text = savedInstanceState.getString("latitude")
-            longitudeField?.text = savedInstanceState.getString("longitude")
-            altitudeField?.text = savedInstanceState.getString("altitude")
+        if (persistentState.getString("latitude", null) != null) {
+            latitudeField?.text = persistentState.getString("latitude", "")
+            longitudeField?.text = persistentState.getString("longitude", "")
+            altitudeField?.text = persistentState.getString("altitude", "")
+
+//            persistentStateEditor.remove("latitude")
+//            persistentStateEditor.remove("longitude")
+//            persistentStateEditor.remove("altitude")
         }
 
         locationRequest = LocationRequest.create()
@@ -164,19 +203,23 @@ class Position : Fragment() {
             // Called when device location information is available.
             override fun onLocationResult(locationResult: LocationResult) {
                 val lastLocation = locationResult.lastLocation
+
+                // Create my location object
                 currentLocation = SimpleLocationItem(
                     lastLocation.latitude,
                     lastLocation.longitude,
                     lastLocation.altitude
                 )
-                latitudeField?.text = currentLocation.latitude.toString()             // Display data if a location is available
+
+                // Update UI fields
+                latitudeField?.text = currentLocation.latitude.toString()
                 longitudeField?.text = currentLocation.longitude.toString()
                 altitudeField?.text = currentLocation.altitude.toString()
 
                 runBlocking {
                     launch {
-                        val entry =
-                            LocationEntity(lastLocation.time, currentLocation)
+                        // Inserting data into DB
+                        val entry = LocationEntity(lastLocation.time, currentLocation)
                         dbManager.insertLocation(entry)
 
                         Log.i(
@@ -188,7 +231,9 @@ class Position : Fragment() {
                         )
                     }
                     launch {
+                        // Check if it's necessary deleting data
                         val locationList = dbManager.getAllLocations()
+                        Log.i("Localizer/P", "OLDEST: ${OLDEST_DATA/1000/60} - MAX_SIZE: $MAX_SIZE")
                         if (locationList.size > MAX_SIZE)
                             dbManager.deleteOld()
                     }
@@ -273,6 +318,14 @@ class Position : Fragment() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        persistentStateEditor.putString("latitude", currentLocation.latitude.toString())
+        persistentStateEditor.putString("longitude", currentLocation.longitude.toString())
+        persistentStateEditor.putString("altitude", currentLocation.altitude.toString())
+        persistentStateEditor.apply()
+        val destinationTab = PositionDirections.actionPositionPageToPositionPage()
+        try {
+            Navigation.findNavController(requireView()).navigate(destinationTab)
+        }catch (e: java.lang.IllegalStateException){}
         orientationChanged = true
     }
 
@@ -281,6 +334,9 @@ class Position : Fragment() {
         if(this::locationCallback.isInitialized && !orientationChanged)
             fusedLocationClient.removeLocationUpdates(locationCallback)
 
+        persistentStateEditor.remove("latitude")
+        persistentStateEditor.remove("longitude")
+        persistentStateEditor.remove("altitude")
 
         if(switchingTabs || (!switchingTabs && backgroundService)) {
 
@@ -295,19 +351,20 @@ class Position : Fragment() {
 
         super.onStop()
     }
+
+    override fun onValueChange(numPicker: NumberPicker?, old: Int, new: Int) {
+        // Update maximum stored data age
+        OLDEST_DATA = new                               // Custom setter on OLDEST_DATA
+        persistentStateEditor.putInt(MAX_MINUTE, new)
+        persistentStateEditor.apply()
+
+        // Update UI text
+        if(this::maxNumLabel.isInitialized)
+            // Custom getter on MAX_SIZE
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                maxNumLabel.text = Html.fromHtml(getString(R.string.max_num_stored, MAX_SIZE), Html.FROM_HTML_MODE_LEGACY)
+            else
+                maxNumLabel.text = getString(R.string.max_num_stored, MAX_SIZE)
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

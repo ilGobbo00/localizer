@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.unipd.localizer.R
+import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.tabs.HistoryDirections
 import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS

@@ -22,13 +22,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
-import com.unipd.localizer.R
+import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
 import it.unipd.localizer.service.BackgroundLocation
-//import com.unipd.localizer.databinding.LocationDetailBinding
-//import com.unipd.localizer.databinding.PositionPageBinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.IllegalStateException

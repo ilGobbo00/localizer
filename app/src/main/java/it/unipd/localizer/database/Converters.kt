@@ -5,12 +5,10 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 
+// Class to convert my location for the database management
 class Converters {
     @TypeConverter
     fun fromLocation(location: SimpleLocationItem?): String?{
-//        Log.d("Room", "Location before conversion: $location")
-//        val storable = Gson().toJson(location)
-//        Log.d("Room", "Location after conversion: $storable")
         return Gson().toJson(location)
     }
 

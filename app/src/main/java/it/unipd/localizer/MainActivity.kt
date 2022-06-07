@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.unipd.localizer.R
 
 class MainActivity : AppCompatActivity() {
     private lateinit var persistentState: SharedPreferences
@@ -21,31 +20,6 @@ class MainActivity : AppCompatActivity() {
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Get SharedPreferences reference
-        /*persistentState = this.getPreferences(MODE_PRIVATE)
-        persistentStateEditor = persistentState.edit()
-
-        val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            permissionObtained = true
-            for (permission in permissions) {
-                Log.i("Localizer/MA", "Checking: $permission")
-                permissionObtained = permissionObtained && permission.value
-            }
-
-            persistentStateEditor.putBoolean(PERMISSIONS, permissionObtained)
-            persistentStateEditor.apply()
-        }
-
-        if(!permissionObtained) {
-            Log.i("Localizer/MA", "Asking permissions")
-            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-                locationPermissionRequest.launch(arrayOf(Manifest.permission.FOREGROUND_SERVICE))
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-        }else
-            Log.i("Localizer/MA", "Permissions already got")*/
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

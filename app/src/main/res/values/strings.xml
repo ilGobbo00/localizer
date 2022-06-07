@@ -8,7 +8,6 @@
     <string name="graph_tab">graph</string>
     <string name="position_tab">position</string>
     <string name="title_activity_main">MainActivity</string>
-    <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
@@ -58,4 +57,8 @@
     <string name="noData">There are no data to show into the charts</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
+    <string name="max_num_stored">Maximum number of locations stored: <![CDATA[<b> %1$d </b>]]></string>
+    <string name="max_num_stored_comp">Maximum number of locations stored: %1$d</string>
+    <string name="max_minute_label">Select the maximum age [min] of stored items</string>
+    <string name="max_number_data">Max number of stored data: %1$d</string>
 </resources>

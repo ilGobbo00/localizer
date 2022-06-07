@@ -11,8 +11,7 @@ import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.*
 import it.unipd.localizer.MainActivity.Companion.PERMISSIONS
-import com.unipd.localizer.R
-import it.unipd.localizer.MainActivity
+import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
@@ -21,6 +20,7 @@ import it.unipd.localizer.tabs.Position
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+// Class for foreground service
 class BackgroundLocation : Service() {
     private var serviceActiveNewRequest = false
     private var permissionsObtained = false
@@ -45,6 +45,7 @@ class BackgroundLocation : Service() {
                 }
                 launch {
                     val locationList = dbManager.getAllLocations()
+                    Log.i("Localizer/P", "OLDEST: ${Position.OLDEST_DATA /1000/60} - MAX_SIZE: ${Position.MAX_SIZE}")
                     if (locationList.size > Position.MAX_SIZE)
                         dbManager.deleteOld()
                 }
@@ -69,10 +70,6 @@ class BackgroundLocation : Service() {
 
     override fun onCreate() {
         Log.d("Localizer/Background", "onCreate")
-
-        // Get SharedPreferences reference
-//        persistentState = application.getp .getPreferences(MODE_PRIVATE)
-//        persistentStateEditor = persistentState.edit()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = getString(R.string.channel_name)
@@ -129,7 +126,7 @@ class BackgroundLocation : Service() {
             notificationBuilder = Notification.Builder(applicationContext, CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.app_description))
-                .setSmallIcon(R.drawable.temp_notification_icon)
+                .setSmallIcon(R.drawable.notification_icon)
 
             val notification = notificationBuilder.build()
             val notificationID = 1224272
@@ -145,7 +142,6 @@ class BackgroundLocation : Service() {
         if(this::fusedLocationClient.isInitialized)
             fusedLocationClient.removeLocationUpdates(locationCallback)
         stopForeground(true)
-//        serviceActiveOldRequest = false
         super.onDestroy()
     }
 }
