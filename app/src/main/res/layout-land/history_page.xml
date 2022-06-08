@@ -166,7 +166,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/tab_menu"
         android:layout_alignParentLeft="true"
-        android:paddingHorizontal="20dp">
+        android:paddingHorizontal="10dp">
 
         <TextView
             android:id="@+id/number_element_label"
@@ -184,7 +184,7 @@
             android:layout_height="match_parent"
             android:layout_below="@id/number_element_label"
             android:layout_centerInParent="true"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </RelativeLayout>
 

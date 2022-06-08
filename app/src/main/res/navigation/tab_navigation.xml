@@ -6,8 +6,7 @@
     android:id="@+id/tab_navigation"
     app:startDestination="@id/positionPage">
 
-<!-- From Position to History -->
-<!-- From Position to Graph -->
+    <!-- Position -->
     <fragment
         android:id="@+id/positionPage"
         android:name="it.unipd.localizer.tabs.Position"
@@ -25,9 +24,9 @@
             android:id="@+id/action_positionPage_to_positionPage"
             app:destination="@id/positionPage"
             app:popUpTo="@id/positionPage"/>
-
     </fragment>
 
+    <!-- History -->
     <fragment
         android:id="@+id/historyPage"
         android:name="it.unipd.localizer.tabs.History"
@@ -50,6 +49,7 @@
             app:popUpTo="@id/positionPage"/>
     </fragment>
 
+    <!-- Graph -->
     <fragment
         android:id="@+id/graphPage"
         android:name="it.unipd.localizer.tabs.Graph"
@@ -69,6 +69,7 @@
             app:popUpTo="@id/graphPage"/>
     </fragment>
 
+    <!-- Details -->
     <fragment
         android:id="@+id/locationDetail"
         android:name="it.unipd.localizer.tabs.Details"

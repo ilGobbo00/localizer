@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
@@ -44,11 +45,13 @@ class History : Fragment(), OnMapReadyCallback {
     private var switchingTabs = false
     private var orientationChanged = false
 
+    // Reference to views
     private lateinit var  positionButton: TextView
     private lateinit var  historyButton: TextView
     private lateinit var  graphButton: TextView
     private lateinit var  deleteButton: FloatingActionButton
 
+    // Reference to database
     private lateinit var database : LocationsDatabase
     private lateinit var dbManager : LocationDao
 
@@ -56,14 +59,18 @@ class History : Fragment(), OnMapReadyCallback {
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
 
+    // Google Map fragment
     private lateinit var mapFragment: SupportMapFragment
 
+    // List with all data stored in database
     private lateinit var allLocations : List<LocationEntity>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.history_page, container, false)
 
-//        database = Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+        // Initialize database variables
         try {
             database = LocationsDatabase.getDatabase(requireContext())
         }catch (e: java.lang.IllegalStateException){
@@ -77,31 +84,30 @@ class History : Fragment(), OnMapReadyCallback {
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
-
+        // Views references
         positionButton = view.findViewById(R.id.position_button)
         historyButton = view.findViewById(R.id.history_button)
         graphButton = view.findViewById(R.id.graph_button)
         deleteButton = view.findViewById(R.id.delete_all_locations)
 
         switchingTabs = false
+
+        // Buttons actions
         positionButton.setOnClickListener { v ->
             val destinationTab = HistoryDirections.actionHistoryPageToPositionPage()
             Navigation.findNavController(v).navigate(destinationTab)
             switchingTabs = true
         }
-
         historyButton.setOnClickListener { v ->
             val destinationTab = HistoryDirections.actionHistoryPageToHistoryPage()
             Navigation.findNavController(v).navigate(destinationTab)
             switchingTabs = true
         }
-
         graphButton.setOnClickListener { v ->
             val destinationTab = HistoryDirections.actionHistoryPageToGraphPage()
             Navigation.findNavController(v).navigate(destinationTab)
             switchingTabs = true
         }
-
         deleteButton.setOnClickListener { v ->
             runBlocking {
                 launch{
@@ -113,22 +119,27 @@ class History : Fragment(), OnMapReadyCallback {
             Navigation.findNavController(v).navigate(destinationTab)
             switchingTabs = true
         }
+        deleteButton.setOnLongClickListener {
+            Toast.makeText(context, getString(R.string.delete_warning), Toast.LENGTH_LONG).show()
+            true
+        }
 
         val elementNum: TextView? = view?.findViewById(R.id.number_element_label)
         val recyclerView: RecyclerView = view.findViewById(R.id.locations_list)
 
-
         runBlocking {
             elementNum?.text = getString(R.string.loading_details)
             launch{
-                allLocations = dbManager.getAllLocations()
-                recyclerView.adapter = LocationAdapter(allLocations, activity)
+                allLocations = dbManager.getAllLocations()                          // Get all stored locations
+                recyclerView.adapter = LocationAdapter(allLocations)
 
+                // Display the number of stored items
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     elementNum?.text = Html.fromHtml(getString(R.string.num_of_element, allLocations.size), FROM_HTML_MODE_LEGACY)
                 else
                     elementNum?.text = getString(R.string.num_of_element_compat, allLocations.size)
 
+                // Get reference to Google Maps fragment if landscape mode
                 if(resources.configuration.orientation == ORIENTATION_LANDSCAPE)
                     mapFragment = childFragmentManager.findFragmentByTag("googleMap") as SupportMapFragment
             }
@@ -153,10 +164,10 @@ class History : Fragment(), OnMapReadyCallback {
         super.onPause()
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d("Localizer/H", "onResume, orientationChanged = $orientationChanged")
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        Log.d("Localizer/H", "onResume, orientationChanged = $orientationChanged")
+//    }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)

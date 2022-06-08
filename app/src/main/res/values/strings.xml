@@ -62,4 +62,5 @@
     <string name="max_minute_label">Select the maximum age [min] of stored items</string>
     <string name="max_number_data">Max number of stored data: %1$d</string>
     <string name="background_button_hint">Button to start/stop background location service</string>
+    <string name="delete_warning">Click this button to erase all data stored</string>
 </resources>

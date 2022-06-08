@@ -1,45 +1,45 @@
 package it.unipd.localizer
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.tabs.HistoryDirections
-import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS
 import java.text.SimpleDateFormat
+import java.util.*
 
-class LocationAdapter(private val locationList: List<LocationEntity>, private val activity: FragmentActivity?) :
+class LocationAdapter(private val locationList: List<LocationEntity>) :
 RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
 
-    // Shared preferences for start/stop background service button
-    private var persistentState: SharedPreferences? = null
-    private var persistentStateEditor: SharedPreferences.Editor? = null
+    companion object{
+        const val TIMESTAMP_PATTERN = "dd/MM/yyyy kk:mm:ss.SSS"
+        const val DAY_PATTERN = "dd/MM/yyyy"
+        const val HOUR_PATTERN = "kk:mm:ss.SSS"
+    }
 
     class LocationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationLabel: TextView = itemView.findViewById(R.id.location_label)
+        private val locationNum: TextView = itemView.findViewById(R.id.location_num)
 
-        fun bind(word: String) {
+        fun bind(position: Int, word: String) {
+            locationNum.text = position.plus(1).toString()
             locationLabel.text = word
         }
-
     }
+
     private val onClickListener = View.OnClickListener { view ->
         val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()    // Get human readable time
         val seeDetails = HistoryDirections.actionHistoryPageToDetailPage(locationDateTime)
         Navigation.findNavController(view).navigate(seeDetails)
 
         // Get SharedPreferences reference
-        persistentState = activity?.getPreferences(Context.MODE_PRIVATE)
-        persistentStateEditor = persistentState?.edit()
-        persistentStateEditor?.putBoolean(SHOW_DETAILS, true)
-        persistentStateEditor?.apply()
+//        persistentState = activity?.getPreferences(Context.MODE_PRIVATE)
+//        persistentStateEditor = persistentState?.edit()
+//        persistentStateEditor?.putBoolean(SHOW_DETAILS, true)
+//        persistentStateEditor?.apply()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationViewHolder {
@@ -57,7 +57,7 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
     override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
         val locationStringList = mutableListOf<String>()
         for(location in locationList)
-            locationStringList.add(SimpleDateFormat("dd-MM-yyyy kk:mm:ss.SSS").format(location.timeStamp))
-        holder.bind(locationStringList[position])
+            locationStringList.add(SimpleDateFormat(TIMESTAMP_PATTERN, Locale.ITALY).format(location.timeStamp))
+        holder.bind(position, locationStringList[position])
     }
 }

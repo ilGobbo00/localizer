@@ -22,6 +22,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
+import it.unipd.localizer.LocationAdapter.Companion.DAY_PATTERN
+import it.unipd.localizer.LocationAdapter.Companion.HOUR_PATTERN
+import it.unipd.localizer.LocationAdapter.Companion.TIMESTAMP_PATTERN
 import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
@@ -31,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
+import java.util.*
 
 class Details:Fragment(), OnMapReadyCallback {
     // Flag used to start/stop requestLocationUpdates
@@ -41,10 +45,10 @@ class Details:Fragment(), OnMapReadyCallback {
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
 
-
+    // Button to return to History tab
     private var backButton: FloatingActionButton? = null
 
-//    private lateinit var referenceLocationRepo: ReferenceLocationRepo
+    // Database
     private lateinit var database : LocationsDatabase
     private lateinit var dbManager : LocationDao
 
@@ -54,26 +58,26 @@ class Details:Fragment(), OnMapReadyCallback {
     private var longitude: TextView? = null
     private var altitude: TextView? = null
 
+    // Google Map reference
     private lateinit var mapFragment: SupportMapFragment
 
+    // Timestamp of location to display
     private lateinit var epochString: String
 
     // Location to display
-    var locationToDisplay: LocationEntity? = null
+    private var locationToDisplay: LocationEntity? = null
 
     companion object{
+        // Constant for persistent state
         const val SHOW_DETAILS = "show_details"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
-        persistentStateEditor = persistentState.edit()
-        persistentStateEditor.putBoolean(SHOW_DETAILS, false)
-        persistentStateEditor.apply()
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
+//        persistentStateEditor = persistentState.edit()
+//    }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.location_detail, container, false)
         try {
@@ -89,7 +93,8 @@ class Details:Fragment(), OnMapReadyCallback {
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
-        backButton = view?.findViewById(R.id.back_to_list)          // Due to orientation change, view can be null
+        // Set background button
+        backButton = view?.findViewById(R.id.back_to_list)
         backButton?.setOnClickListener { clickView ->
             val destinationTab = DetailsDirections.actionDetailPageToHistoryPage()
             Navigation.findNavController(clickView).navigate(destinationTab)
@@ -105,12 +110,9 @@ class Details:Fragment(), OnMapReadyCallback {
         // Get parameter passed thought fragment.
         // Use the timestamp (unique) to obtain the element from DB after conversion from human-readable date to epoch
         epochString = DetailsArgs.fromBundle(requireArguments()).location
-        val timestamp: Long? = SimpleDateFormat("dd-MM-yyyy kk:mm:ss.SSS").parse(epochString)?.time
-
-
+        val timestamp: Long? = SimpleDateFormat(TIMESTAMP_PATTERN, Locale.ITALY).parse(epochString)?.time
 
         runBlocking{
-//            var locationToDisplay: LocationEntity
             // Display loading text
             time?.text = getString(R.string.loading_details)
             latitude?.text = getString(R.string.loading_details)
@@ -118,16 +120,15 @@ class Details:Fragment(), OnMapReadyCallback {
             altitude?.text = getString(R.string.loading_details)
 
             launch {
-//                locationToDisplay = referenceLocationRepo.getLocation(timestamp!!)
                 locationToDisplay = timestamp?.let { dbManager.getLocation(it) }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    time?.text = Html.fromHtml(getString(R.string.time_location_detail, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp)), FROM_HTML_MODE_LEGACY)
+                    time?.text = Html.fromHtml(getString(R.string.time_location_detail, SimpleDateFormat(DAY_PATTERN, Locale.ITALY).format(timestamp), SimpleDateFormat(HOUR_PATTERN, Locale.ITALY).format(timestamp)), FROM_HTML_MODE_LEGACY)
                     latitude?.text = Html.fromHtml(getString(R.string.latitude_read_detail, locationToDisplay?.location!!.latitude.toString()), FROM_HTML_MODE_LEGACY)
                     longitude?.text = Html.fromHtml(getString(R.string.longitude_read_detail, locationToDisplay?.location!!.longitude.toString()), FROM_HTML_MODE_LEGACY)
                     altitude?.text = Html.fromHtml(getString(R.string.altitude_read_detail, locationToDisplay?.location!!.altitude.toString()), FROM_HTML_MODE_LEGACY)
                 }else{
-                    time?.text = getString(R.string.time_location_detail_compat, SimpleDateFormat("dd-MM-yyy").format(timestamp), SimpleDateFormat("kk:mm:ss.SSS").format(timestamp))
+                    time?.text = getString(R.string.time_location_detail_compat, SimpleDateFormat(DAY_PATTERN, Locale.ITALY).format(timestamp), SimpleDateFormat(HOUR_PATTERN, Locale.ITALY).format(timestamp))
                     latitude?.text = getString(R.string.latitude_read_detail_compat, locationToDisplay?.location!!.latitude.toString())
                     longitude?.text = getString(R.string.longitude_read_detail_compat, locationToDisplay?.location!!.longitude.toString())
                     altitude?.text = getString(R.string.altitude_read_detail_compat, locationToDisplay?.location!!.altitude.toString())
@@ -142,10 +143,9 @@ class Details:Fragment(), OnMapReadyCallback {
 
 
         if(locationToDisplay == null){
-//            val title: TextView = binding.titlePositionDetail
             val title: TextView = view.findViewById(R.id.title_position_detail)
-            val errorDay: String = SimpleDateFormat("dd-MM-yyyy").format(timestamp)
-            val errorTime: String = SimpleDateFormat("kk:mm:ss.SSS").format(timestamp)
+            val errorDay: String = SimpleDateFormat(DAY_PATTERN, Locale.ITALY).format(timestamp)
+            val errorTime: String = SimpleDateFormat(HOUR_PATTERN, Locale.ITALY).format(timestamp)
 
             title.text = getString(R.string.location_details_title_error)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -158,7 +158,6 @@ class Details:Fragment(), OnMapReadyCallback {
             return view
         }
 
-        Log.d("Execution", "Return from Detail")
         return view
     }
 
@@ -169,7 +168,6 @@ class Details:Fragment(), OnMapReadyCallback {
             backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
             requireContext().stopService(backgroundIntent)
         }
-
         super.onPause()
     }
 
