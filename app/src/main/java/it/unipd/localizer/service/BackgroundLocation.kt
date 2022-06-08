@@ -35,8 +35,8 @@ class BackgroundLocation : Service() {
             val entry = LocationEntity(lastLocation.time, currentLocation)
             Log.i("Localizer/Background", "Saving - " +
                     "${lastLocation.time} | " +
-                    "${currentLocation.latitude.toString()} | " +
-                    "${currentLocation.longitude.toString()}  | " +
+                    "${currentLocation.latitude} | " +
+                    "${currentLocation.longitude}  | " +
                     currentLocation.altitude.toString())
 
             runBlocking{
@@ -76,14 +76,11 @@ class BackgroundLocation : Service() {
             val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(CHANNEL_ID, name, importance)
             channel.description = description
-            val notificationManager = getSystemService(
-                NotificationManager::class.java
-            )
+            val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
         super.onCreate()
     }
-
 
     // Only Localizer can stop and start background service
     override fun onBind(p0: Intent?): IBinder? {
@@ -121,19 +118,22 @@ class BackgroundLocation : Service() {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
         val notificationBuilder: Notification.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             notificationBuilder = Notification.Builder(applicationContext, CHANNEL_ID)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.app_description))
-                .setSmallIcon(R.drawable.notification_icon)
+        else
+            notificationBuilder = Notification.Builder(applicationContext)
 
-            val notification = notificationBuilder.build()
-            val notificationID = 1224272
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                startForeground(notificationID, notification, FOREGROUND_SERVICE_TYPE_LOCATION)
-            else
-                startForeground(notificationID, notification)
-        }
+        notificationBuilder.setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.app_description))
+            .setSmallIcon(R.drawable.notification_icon)
+
+        val notification = notificationBuilder.build()
+        val notificationID = 1224272
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            startForeground(notificationID, notification, FOREGROUND_SERVICE_TYPE_LOCATION)
+        else
+            startForeground(notificationID, notification)
+
     }
 
     override fun onDestroy() {

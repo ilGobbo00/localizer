@@ -140,7 +140,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             maxNumLabel.text = Html.fromHtml(getString(R.string.max_num_stored, MAX_SIZE), Html.FROM_HTML_MODE_LEGACY)
         else
-            maxNumLabel.text = getString(R.string.max_num_stored, MAX_SIZE)
+            maxNumLabel.text = getString(R.string.max_num_stored_comp, MAX_SIZE)
 
         // Set buttons actions
         switchingTabs = false
@@ -285,10 +285,10 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         super.onResume()
     }
 
-    override fun onPause() {
-        Log.i("Localizer/P", "onPause")
-        super.onPause()
-    }
+//    override fun onPause() {
+//        Log.i("Localizer/P", "onPause")
+//        super.onPause()
+//    }
 
     override fun onStop() {
         Log.i("Localizer/P", "OnStop. locationCallBack = $locationCallback")

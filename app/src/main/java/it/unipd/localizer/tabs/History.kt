@@ -176,7 +176,6 @@ class History : Fragment(), OnMapReadyCallback {
             Navigation.findNavController(requireView()).navigate(destinationTab)
         }catch (e: IllegalStateException){}
         orientationChanged = true
-        Log.d("Localizer/H", "Orientation changed ($orientationChanged)")
     }
 
     override fun onMapReady(map: GoogleMap) {

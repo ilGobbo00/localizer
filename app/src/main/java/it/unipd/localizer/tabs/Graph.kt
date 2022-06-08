@@ -191,7 +191,7 @@ class Graph : Fragment(){
         data.setCircleColor(getColor(resources, R.color.teal_700, null))
         data.setDrawCircles(false)
         data.setDrawValues(false)
-//        data.setColors(Color.CYAN)
+        data.lineWidth = 2f
     }
 
     override fun onPause() {

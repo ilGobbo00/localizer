@@ -32,7 +32,7 @@
     <string name="back_button_description">back_to_location_list</string>
     <string name="altitude_label">Altitude</string>
     <string name="num_of_element">Number of element <![CDATA[<b> %1$d </b>]]> </string>
-    <string name="num_of_element_compat">Number of element %1$d</string>
+    <string name="num_of_element_compat">Number of elements %1$d</string>
     <string name="stop_background_service">Stop background service</string>
     <string name="start_background_service">Start background service</string>
     <string name="running_service">start</string>
