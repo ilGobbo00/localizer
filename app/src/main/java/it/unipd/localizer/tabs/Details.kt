@@ -38,26 +38,30 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Details:Fragment(), OnMapReadyCallback {
-    // Flag used to start/stop requestLocationUpdates
+    //region Flag used to start/stop requestLocationUpdates
     private var orientationChanged = false
     private var backPressed = false
+    //endregion
 
-    // Shared preferences for start/stop background service button
+    //region Shared preferences for start/stop background service button
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
+    //endregion
 
     // Button to return to History tab
     private var backButton: FloatingActionButton? = null
 
-    // Database
+    //region Database
     private lateinit var database : LocationsDatabase
     private lateinit var dbManager : LocationDao
+    //endregion
 
-    // Labels
+    //region Labels
     private var time: TextView? = null
     private var latitude: TextView? = null
     private var longitude: TextView? = null
     private var altitude: TextView? = null
+    //endregion
 
     // Google Map reference
     private lateinit var mapFragment: SupportMapFragment
@@ -73,15 +77,12 @@ class Details:Fragment(), OnMapReadyCallback {
         const val SHOW_DETAILS = "show_details"
     }
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
-//        persistentStateEditor = persistentState.edit()
-//    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.location_detail, container, false)
 
+        //region Database
         try {
             database = LocationsDatabase.getDatabase(requireContext())
         }catch (e: IllegalStateException){
@@ -90,6 +91,7 @@ class Details:Fragment(), OnMapReadyCallback {
             return view
         }
         dbManager = database.locationDao()
+        //endregion
 
         // Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
@@ -103,11 +105,12 @@ class Details:Fragment(), OnMapReadyCallback {
             backPressed = true
         }
 
-        // Reference to labels
+        //region Reference to labels
         time = view?.findViewById(R.id.location_time_detail)
         latitude = view?.findViewById(R.id.location_latitude_detail)
         longitude = view?.findViewById(R.id.location_longitude_detail)
         altitude = view?.findViewById(R.id.location_altitude_detail)
+        //endregion
 
         // Get parameter passed thought fragment.
         // Use the timestamp (unique) to obtain the element from DB after conversion from human-readable date to epoch
@@ -136,14 +139,13 @@ class Details:Fragment(), OnMapReadyCallback {
                     altitude?.text = getString(R.string.altitude_read_detail_compat, locationToDisplay?.location!!.altitude.toString())
                 }
                 mapFragment = childFragmentManager.findFragmentByTag("googleMap") as SupportMapFragment
-
             }
 
         }
         if(this::mapFragment.isInitialized)
             mapFragment.getMapAsync(this)
 
-
+        // Page to display in case some error occurs
         if(locationToDisplay == null){
             val title: TextView = view.findViewById(R.id.title_position_detail)
             val errorDay: String = SimpleDateFormat(DAY_PATTERN, Locale.ITALY).format(timestamp)
@@ -165,6 +167,7 @@ class Details:Fragment(), OnMapReadyCallback {
 
     override fun onPause() {
         val backgroundService = persistentState.getBoolean(Position.BACKGROUND_RUNNING, false)
+        // If user exits from the app without requesting foreground service, stop it
         if(!backPressed && !orientationChanged && !backgroundService) {
             val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
             backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
@@ -175,6 +178,7 @@ class Details:Fragment(), OnMapReadyCallback {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        // Navigate selecting autonomously the fragment (with different layout)
         val destinationTab = DetailsDirections.actionDetailPageToDetailPage(epochString)
         try {
             Navigation.findNavController(requireView()).navigate(destinationTab)

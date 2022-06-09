@@ -22,9 +22,22 @@ import kotlinx.coroutines.runBlocking
 
 // Class for foreground service
 class BackgroundLocation : Service() {
+    //region Flag for permissions and service status
     private var serviceActiveNewRequest = false
     private var permissionsObtained = false
+    //endregion
 
+    //region Database variables
+    private lateinit var database : LocationsDatabase
+    private lateinit var dbManager : LocationDao
+    //endregion
+
+    //region Variables for position
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var currentLocation: SimpleLocationItem
+    //endregion
+
+    // Callback for requestLocationUpdates
     private val locationCallback = object : LocationCallback() {
         // Called when device location information is available.
         override fun onLocationResult(locationResult : LocationResult){
@@ -53,23 +66,17 @@ class BackgroundLocation : Service() {
         }
     }
 
-    // Database variables/values
-    private lateinit var database : LocationsDatabase
-    private lateinit var dbManager : LocationDao
-
-    // Variable for position
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var currentLocation: SimpleLocationItem
-
-
     companion object {
+        //region Persistent state keys
         const val BACKGROUND_SERVICE = "background_service"
         const val CHANNEL_ID = "localizer_channel"
+        //endregion
     }
 
     override fun onCreate() {
         Log.d("Localizer/Background", "onCreate")
 
+        // Notification creation
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = getString(R.string.channel_name)
             val description = getString(R.string.channel_description)
@@ -117,11 +124,11 @@ class BackgroundLocation : Service() {
 
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
-        val notificationBuilder: Notification.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            notificationBuilder = Notification.Builder(applicationContext, CHANNEL_ID)
-        else
-            notificationBuilder = Notification.Builder(applicationContext)
+        val notificationBuilder: Notification.Builder =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                Notification.Builder(applicationContext, CHANNEL_ID)
+            else
+                Notification.Builder(applicationContext)
 
         notificationBuilder.setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.app_description))

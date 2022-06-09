@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         persistentState = this.getPreferences(MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
+        // Checking permissions
         val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             permissionObtained = ContextCompat.checkSelfPermission(applicationContext, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED ||
                     ContextCompat.checkSelfPermission(applicationContext, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
                 persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
         }
 
-        // Ask permission if not granted
+        // Asking permission if not granted
         if(!permissionObtained) {
             Log.i("Localizer/MA", "Asking permissions")
             locationPermissionRequest.launch(arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION))

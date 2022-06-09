@@ -33,22 +33,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class Graph : Fragment(){
-    // Flag used to start/stop requestLocationUpdates
+    //region Flag used to start/stop requestLocationUpdates
     private var switchingTabs = false
     private var orientationChanged = false
+    //endregion
 
+    //region Navigation button
     private lateinit var  positionButton: TextView
     private lateinit var  historyButton: TextView
     private lateinit var  graphButton: TextView
+    //endregion
 
+    //region Charts
     private lateinit var chartLocations: LineChart
     private lateinit var chartAltitudes: LineChart
+    //endregion
 
+    //region Database
     private lateinit var database: LocationsDatabase
     private lateinit var dbManager: LocationDao
-    // Shared preferences for start/stop background service button
+    //endregion
+
+    //region Shared preferences for start/stop background service button
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
+    //endregion
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.graph_page, container, false)
@@ -56,7 +65,7 @@ class Graph : Fragment(){
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
 
-//        database =Room.databaseBuilder(requireContext(), LocationsDatabase::class.java, "locations").build()
+        //region Database section
         try {
             database = LocationsDatabase.getDatabase(requireContext())
         }catch (e: java.lang.IllegalStateException){
@@ -65,20 +74,19 @@ class Graph : Fragment(){
             return view
         }
         dbManager = database.locationDao()
+        //endregion
 
-        //return super.onCreateView(inflater, container, savedInstanceState)
-        //super.onCreate(savedInstanceState)
-        //view.setContentView(R.layout.position_page)
-
+        //region View references
         positionButton = view.findViewById(R.id.position_button)
         historyButton = view.findViewById(R.id.history_button)
         graphButton = view.findViewById(R.id.graph_button)
         chartLocations = view.findViewById(R.id.chartLocations)
         chartAltitudes = view.findViewById(R.id.chartAltitudes)
+        //endregion
         chartAddStyles(chartLocations)
         chartAddStyles(chartAltitudes)
 
-
+        //region Navigation section
         switchingTabs = false
         positionButton.setOnClickListener { v ->
             val destinationTab = GraphDirections.actionGraphPageToPositionPage()
@@ -95,8 +103,9 @@ class Graph : Fragment(){
             Navigation.findNavController(v).navigate(destinationTab)
             switchingTabs = true
         }
+        //endregion
 
-
+        //region Charts section
         var locationsList: MutableList<LocationEntity> = ArrayList()
         runBlocking {
             launch {
@@ -104,22 +113,27 @@ class Graph : Fragment(){
 
             }
         }
+
+        // Charts entries
         val entriesChart1: MutableList<Entry> = ArrayList()
         val entriesChart2: MutableList<Entry> = ArrayList()
+        // Variable for chart 1 portrait
         val distance = FloatArray(1)
+        // Variable for all charts
         var currentLoc: SimpleLocationItem
+        // Charts titles
         val chart1Title: TextView = view.findViewById(R.id.locations_chart_title)
         val chart2Title: TextView = view.findViewById(R.id.altitude_chart_title)
 
         if(locationsList.size < 2){
+            val noDataLabel: TextView = view.findViewById(R.id.not_enough_data)
             if(locationsList.isEmpty())
-                chart1Title.text = getString(R.string.noData)
+                noDataLabel.text = getString(R.string.noData)
             else
-                chart1Title.text = getString(R.string.tooFewItems)
+                noDataLabel.text = getString(R.string.tooFewItems)
 
+            chart1Title.text = ""
             chart2Title.text = ""
-            (chartLocations as ViewGroup).removeView(chartLocations)
-            (chartAltitudes as ViewGroup).removeView(chartAltitudes)
             return view
         }
 
@@ -149,10 +163,10 @@ class Graph : Fragment(){
             else -> {
                 for(i in IntRange(0, locationsList.size-1)) {
                     currentLoc = locationsList[i].location
-
                     entriesChart1.add(Entry(i.toFloat(), currentLoc.latitude.toFloat()))
                     entriesChart2.add(Entry(i.toFloat(), currentLoc.longitude.toFloat()))
                 }
+
                 // Get last entry for altitude chart
                 entriesChart2.add(Entry((locationsList.size-1).toFloat(), locationsList[locationsList.size-1].location.altitude.toFloat()))
 
@@ -171,10 +185,12 @@ class Graph : Fragment(){
         val lineDataAltitude = LineData(dataSetChart2)
         chartAltitudes.data = lineDataAltitude
         chartAltitudes.invalidate()
+        //endregion
 
         return view
     }
 
+    // Function to add styles to charts
     private fun chartAddStyles(chart: LineChart){
         chart.setBackgroundColor(Color.WHITE)
         chart.description.isEnabled = false
@@ -183,10 +199,12 @@ class Graph : Fragment(){
         chart.setTouchEnabled(true)
         chart.setScaleEnabled(true)
         chart.setPinchZoom(true)
+        chart.legend.isEnabled = false
         val xAxis = chart.xAxis
         xAxis.isEnabled = false
     }
 
+    // Function to add styles to charts data
     private fun dataAddStyles(data: LineDataSet){
         data.setCircleColor(getColor(resources, R.color.teal_700, null))
         data.setDrawCircles(false)
@@ -196,6 +214,7 @@ class Graph : Fragment(){
 
     override fun onPause() {
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
+        // If user exits from the app without requesting foreground service, stop it
         if(!switchingTabs && !backgroundService && !orientationChanged) {
             val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
             backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
@@ -205,8 +224,10 @@ class Graph : Fragment(){
         super.onPause()
     }
 
+    // Called when orientation changes
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        // Navigate selecting autonomously the fragment (with different layout)
         val destinationTab = GraphDirections.actionGraphPageToGraphPage()
         try {
             Navigation.findNavController(requireView()).navigate(destinationTab)

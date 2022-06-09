@@ -30,16 +30,12 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
         }
     }
 
+    // Events on item list
     private val onClickListener = View.OnClickListener { view ->
-        val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()    // Get human readable time
+        val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()
         val seeDetails = HistoryDirections.actionHistoryPageToDetailPage(locationDateTime)
         Navigation.findNavController(view).navigate(seeDetails)
 
-        // Get SharedPreferences reference
-//        persistentState = activity?.getPreferences(Context.MODE_PRIVATE)
-//        persistentStateEditor = persistentState?.edit()
-//        persistentStateEditor?.putBoolean(SHOW_DETAILS, true)
-//        persistentStateEditor?.apply()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationViewHolder {

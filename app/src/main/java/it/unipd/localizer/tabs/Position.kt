@@ -39,39 +39,46 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class Position : Fragment(), NumberPicker.OnValueChangeListener {
-    // Database variables/values
+    // region Database variables/values
     private lateinit var database: LocationsDatabase
     private lateinit var dbManager: LocationDao
+    // endregion
 
-    // Navigation buttons
+    //region Navigation buttons
     private lateinit var historyButton: TextView
     private lateinit var graphButton: TextView
+    //endregion
 
-    // Flag used to start/stop requestLocationUpdates
+    //region Flag used to start/stop requestLocationUpdates
     private var switchingTabs = false
     private var orientationChanged = false
+    //endregion
 
-    // Background service button
+    //region Background service button
     private lateinit var backgroundButton: FloatingActionButton
+    //endregion
 
-    // Variables for location methods
+    //region Variables for location methods
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
+    //endregion
 
-    // Fields to display data and custom location class
+    //region Fields to display data and custom location class
     private lateinit var currentLocation: SimpleLocationItem
     private var latitudeField: TextView? = null
     private var longitudeField: TextView? = null
     private var altitudeField: TextView? = null
     private lateinit var maxNumLabel: TextView
+    //endregion
 
     // Variable to enable background service
     private var backgroundService = false
-    // Shared preferences for start/stop background service button
-    private lateinit var persistentState: SharedPreferences
 
+    //region Shared preferences for start/stop background service button
+    private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
+    //endregion
 
     // Number Picker to modify list size
     private lateinit var minuteSelector: NumberPicker
@@ -284,11 +291,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
         super.onResume()
     }
-
-//    override fun onPause() {
-//        Log.i("Localizer/P", "onPause")
-//        super.onPause()
-//    }
 
     override fun onStop() {
         Log.i("Localizer/P", "OnStop. locationCallBack = $locationCallback")

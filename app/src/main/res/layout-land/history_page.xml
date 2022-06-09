@@ -111,7 +111,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/div_title"
-        android:background="#EAEAEA">
+        android:background="@color/light_grey">
 
         <TextView
             android:id="@+id/position_button"

@@ -109,7 +109,7 @@
         android:id="@+id/tab_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EAEAEA"
+        android:background="@color/light_grey"
         android:layout_below="@id/div_title">
 
         <TextView
