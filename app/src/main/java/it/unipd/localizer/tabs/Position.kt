@@ -13,7 +13,6 @@ import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.TextView
@@ -110,7 +109,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     override fun onCreateView( inflater: LayoutInflater,
                                container: ViewGroup?,
                                savedInstanceState: Bundle? ): View? {
-        Log.i("Localizer/P", "OnCreateView")
         val view = inflater.inflate(R.layout.position_page, container, false)
 
         // Reference to database repository
@@ -138,6 +136,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         minuteSelector.minValue = 1
         minuteSelector.maxValue = 10
         minuteSelector.value = persistentState.getInt(MAX_MINUTE,5)
+        minuteSelector.isClickable
 
         // Update max stored data age
         OLDEST_DATA = persistentState.getInt(MAX_MINUTE, 5)
@@ -245,8 +244,10 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
                     launch {
                         // Check if it's necessary deleting data
                         val locationList = dbManager.getAllLocations()
-                        if (locationList.size > MAX_SIZE)
+                        if (locationList.size > MAX_SIZE) {
+                            Log.i("Localizer/P", "Deleting oldest data..")
                             dbManager.deleteOld()
+                        }
                     }
                 }
                 super.onLocationResult(locationResult)
@@ -270,8 +271,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     @SuppressLint("MissingPermission")          // Already checked in Activity lifecycle
     override fun onResume() {
-        Log.i("Localizer/P", "onResume. Permissions: ${persistentState.getBoolean(PERMISSIONS, false)}")
-
         // Check permissions every time fragment starts
         if(persistentState.getBoolean(PERMISSIONS, false)){
             // Needed block to start service after getting permissions
@@ -293,18 +292,14 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     }
 
     override fun onStop() {
-        Log.i("Localizer/P", "OnStop. locationCallBack = $locationCallback")
-
         // Stop location updates from reading position (avoid multiple processes creating a new fragment)
         fusedLocationClient.removeLocationUpdates(locationCallback)
         persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
 
         // If user change tab displayed or exits after starting "background" service, enable foreground service
         if(switchingTabs || (!switchingTabs && backgroundService)) {
-            Log.i("Localizer/P", "requestLocationUpdates removed")
-
             // If user enable background service start it
-            Log.d("Localizer/P", "onStop, start foreground service")
+            Log.i("Localizer/P", "onStop, start foreground service")
             val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
             backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
             backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
@@ -313,7 +308,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
         // If user exit from the app, remove last location data read, else save its fields
         if(!switchingTabs && !orientationChanged){
-            Log.i("Localizer/P", "Removing currentLocation stored data")
             persistentStateEditor.remove(LATITUDE)
             persistentStateEditor.remove(LONGITUDE)
             persistentStateEditor.remove(ALTITUDE)
@@ -332,7 +326,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     // Update fab button based on foreground service status
     private fun updateFAB() {
-        Log.d("Localizer/P", "updateFAB")
         if (!persistentState.getBoolean(BACKGROUND_RUNNING, false)){
             backgroundService = false
             backgroundButton.setImageResource(R.drawable.start)
@@ -360,7 +353,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     // Function called on Number Picker scroll
     override fun onValueChange(numPicker: NumberPicker?, old: Int, new: Int) {
-        Log.i("Localizer/P", "Storage size changed from $old to $new")
+        Log.i("Localizer/P", "Oldest minute changed from $old min to $new min")
 
         // Update maximum stored data age
         OLDEST_DATA = new                               // Custom setter on OLDEST_DATA

@@ -14,7 +14,6 @@ android {
     defaultConfig {
         applicationId "com.unipd.localizer"
         minSdk 21
-//        maxSdk 30 // Due to API>30 restrictions
         targetSdk 29
         versionCode 1
         versionName "1.0"

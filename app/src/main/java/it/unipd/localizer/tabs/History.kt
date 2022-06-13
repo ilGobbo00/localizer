@@ -131,7 +131,7 @@ class History : Fragment(), OnMapReadyCallback {
             elementNum?.text = getString(R.string.loading_details)
             launch{
                 allLocations = dbManager.getAllLocations()                          // Get all stored locations
-                recyclerView.adapter = LocationAdapter(allLocations)
+                recyclerView.adapter = LocationAdapter(allLocations, activity)
 
                 // Display the number of stored items
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -151,8 +151,8 @@ class History : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    // Check if foreground service must be stopped
     override fun onPause() {
-        Log.d("Localizer/H", "onPause, orientationChanged = $orientationChanged")
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
         val showDetails = persistentState.getBoolean(SHOW_DETAILS, false)
         if(!switchingTabs && !backgroundService && !orientationChanged && !showDetails) {
@@ -163,11 +163,6 @@ class History : Fragment(), OnMapReadyCallback {
 
         super.onPause()
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//        Log.d("Localizer/H", "onResume, orientationChanged = $orientationChanged")
-//    }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -192,7 +187,7 @@ class History : Fragment(), OnMapReadyCallback {
             location = LatLng(avgLat/allLocations.size, avgLong/allLocations.size)
             val cameraPosition = CameraPosition.Builder()
                 .target(location)
-                .zoom(10f)
+                .zoom(15f)
                 .build()
             map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 800, null)
         }

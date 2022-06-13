@@ -1,6 +1,5 @@
 package it.unipd.localizer
 
-import android.Manifest
 import android.Manifest.permission.*
 import android.content.SharedPreferences
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -10,6 +9,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import it.unipd.localizer.tabs.Details.Companion.BACK_PRESSED
 
 class MainActivity : AppCompatActivity() {
     private lateinit var persistentState: SharedPreferences
@@ -56,5 +56,12 @@ class MainActivity : AppCompatActivity() {
             Log.i("Localizer/MA", "Permissions already got")
 
         super.onStart()
+    }
+
+    // Management of back button pressure in Details
+    override fun onBackPressed() {
+        persistentStateEditor.putBoolean(BACK_PRESSED, true)
+        persistentStateEditor.apply()
+        super.onBackPressed()
     }
 }

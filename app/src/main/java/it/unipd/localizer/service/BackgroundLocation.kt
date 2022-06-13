@@ -1,8 +1,10 @@
 package it.unipd.localizer.service
 
 import android.annotation.SuppressLint
-import android.app.*
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.Build
@@ -22,7 +24,7 @@ import kotlinx.coroutines.runBlocking
 
 // Class for foreground service
 class BackgroundLocation : Service() {
-    //region Flag for permissions and service status
+    //region Flags for permissions and service status
     private var serviceActiveNewRequest = false
     private var permissionsObtained = false
     //endregion
@@ -46,20 +48,22 @@ class BackgroundLocation : Service() {
 
             // Then insert new valid position
             val entry = LocationEntity(lastLocation.time, currentLocation)
-            Log.i("Localizer/Background", "Saving - " +
-                    "${lastLocation.time} | " +
-                    "${currentLocation.latitude} | " +
-                    "${currentLocation.longitude}  | " +
-                    currentLocation.altitude.toString())
 
             runBlocking{
                 launch{
+                    Log.i("Localizer/F", "Saving: " +
+                            "${lastLocation.time} | " +
+                            "${currentLocation.latitude} | " +
+                            "${currentLocation.longitude}  | " +
+                            currentLocation.altitude.toString())
                     dbManager.insertLocation(entry)
                 }
                 launch {
                     val locationList = dbManager.getAllLocations()
-                    if (locationList.size > Position.MAX_SIZE)
+                    if (locationList.size > Position.MAX_SIZE) {
+                        Log.i("Localizer/F", "Deleting oldest data..")
                         dbManager.deleteOld()
+                    }
                 }
             }
             super.onLocationResult(locationResult)
@@ -74,8 +78,6 @@ class BackgroundLocation : Service() {
     }
 
     override fun onCreate() {
-        Log.d("Localizer/Background", "onCreate")
-
         // Notification creation
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = getString(R.string.channel_name)
@@ -95,23 +97,22 @@ class BackgroundLocation : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("Localizer/Background", "onStartCommand")
         permissionsObtained = intent?.getBooleanExtra(PERMISSIONS, false) ?: false
         serviceActiveNewRequest = intent?.getBooleanExtra(BACKGROUND_SERVICE, false) ?: false
         if(serviceActiveNewRequest && permissionsObtained) {
-            backgroundLocalizer()
+            foregroundLocalizer()
         }
         return START_REDELIVER_INTENT
     }
 
     @SuppressLint("MissingPermission") // If here permissions are already obtained
-    private fun backgroundLocalizer(){
-        Log.d("Localizer/Background", "Permissions obtained, start backgroundLocalizer")
+    private fun foregroundLocalizer(){
+        Log.i("Localizer/F", "Start foreground service")
 
         try {
             database = LocationsDatabase.getDatabase(applicationContext)
         }catch (e: java.lang.IllegalStateException){
-            Log.e("Localizer/B", "Can't create database due to context error")
+            Log.e("Localizer/F", "Can't create database due to context error")
             return
         }
         dbManager = database.locationDao()
@@ -144,7 +145,7 @@ class BackgroundLocation : Service() {
     }
 
     override fun onDestroy() {
-        Log.d("Localizer/Background", "onDestroy")
+        Log.d("Localizer/F", "Stop foreground service")
         if(this::fusedLocationClient.isInitialized)
             fusedLocationClient.removeLocationUpdates(locationCallback)
         stopForeground(true)

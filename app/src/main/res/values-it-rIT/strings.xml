@@ -22,7 +22,7 @@
     <string name="delete_warning">Clicca il bottone per eliminare tutte le posizioni salvate</string>
     <string name="background_button_hint">Inizia/ferma la lettura delle applicazioni in background</string>
     <string name="max_number_data">Numero massimo di posizioni salvate: %1$d</string>
-    <string name="max_minute_label">Seleziona  il numero massimo di minuti\nper le posizioni salvate</string>
+    <string name="max_minute_label">Seleziona il numero di minuti\ndella posizione più vecchia salvata</string>
     <string name="max_num_stored_comp">Numero massimo di posizioni salvate: %1$d</string>
     <string name="max_num_stored">Numero massimo di posizioni salvate: <![CDATA[<b> %1$d </b>]]></string>
     <string name="longitude">Longitudine</string>
@@ -30,17 +30,14 @@
     <string name="noData">Nessun dato da graficare</string>
     <string name="tooFewItems">Ci sono troppi pochi elementi per mostrare un grafico</string>
     <string name="error">C\'è stato un problema %1$s</string>
-    <string name="altitudes_chart_title">Andamento dell\'altitudine  (basato sui dati salvati)</string>
+    <string name="altitudes_chart_title">Andamento dell\'altitudine\n(basato sui dati salvati)</string>
     <string name="locations_chart_title">Andamento dei metri percorsi\n(basato sui dati salvati)</string>
     <string name="permissions_denied">I permessi richiesti sono stati negati</string>
     <string name="elements_deleted">Tutti gli elementi sono stati eliminati</string>
     <string name="loading_details">Caricamento..</string>
     <string name="invalid_location_hint">Impossibile leggere i dettagli della posizione</string>
-    <string name="unknown">Sconosciuto</string>
-    <string name="delete_toast">Aggiorna la pagina per vedere le modifiche</string>
     <string name="delete_all_locations">Cancella tutte le posizioni salvate</string>
     <string name="app_description">Salvataggio delle posizioni</string>
-    <string name="stop_background_service">Stop servizio in background</string>
     <string name="start_background_service">Start servizio in background</string>
     <string name="starting_background_service">Servizo in background partito!</string>
     <string name="stopping_background_service">Servizio in background fermato!</string>

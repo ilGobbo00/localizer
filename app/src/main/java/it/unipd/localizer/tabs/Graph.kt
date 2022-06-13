@@ -59,7 +59,9 @@ class Graph : Fragment(){
     private lateinit var persistentStateEditor: SharedPreferences.Editor
     //endregion
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.graph_page, container, false)
         // Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
@@ -212,6 +214,7 @@ class Graph : Fragment(){
         data.lineWidth = 2f
     }
 
+    // Check if foreground service must be stopped
     override fun onPause() {
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
         // If user exits from the app without requesting foreground service, stop it

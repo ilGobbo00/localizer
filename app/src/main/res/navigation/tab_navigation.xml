@@ -3,27 +3,30 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tab_navigation"
-    app:startDestination="@id/positionPage">
+    app:startDestination="@id/positionPage"
+    >
 
     <!-- Position -->
     <fragment
         android:id="@+id/positionPage"
         android:name="it.unipd.localizer.tabs.Position"
         android:label="position_page"
-        tools:layout="@layout/position_page">
+        tools:layout="@layout/position_page"
+        >
         <action
             android:id="@+id/action_positionPage_to_historyPage"
             app:destination="@id/historyPage"
-            app:popUpTo="@id/historyPage"/>
+            />
         <action
             android:id="@+id/action_positionPage_to_graphPage"
             app:destination="@id/graphPage"
-            app:popUpTo="@id/graphPage"/>
+            />
         <action
             android:id="@+id/action_positionPage_to_positionPage"
             app:destination="@id/positionPage"
-            app:popUpTo="@id/positionPage"/>
+            app:popUpTo="@id/positionPage"
+            app:popUpToInclusive="true"
+            />
     </fragment>
 
     <!-- History -->
@@ -31,22 +34,28 @@
         android:id="@+id/historyPage"
         android:name="it.unipd.localizer.tabs.History"
         android:label="history_page"
-        tools:layout="@layout/history_page">
+        tools:layout="@layout/history_page"
+        >
         <action
             android:id="@+id/action_historyPage_to_positionPage"
             app:destination="@id/positionPage"
-            app:popUpTo="@id/positionPage"/>
+            app:popUpTo="@id/positionPage"
+            app:popUpToInclusive="true"
+            />
         <action
             android:id="@+id/action_historyPage_to_graphPage"
             app:destination="@id/graphPage"
-            app:popUpTo="@id/graphPage"/>
+            app:popUpTo="@id/positionPage"
+            />
         <action
             android:id="@+id/action_historyPage_to_detailPage"
-            app:destination="@id/locationDetail"/>
+            app:destination="@id/locationDetail"
+            />
         <action
             android:id="@+id/action_historyPage_to_historyPage"
             app:destination="@id/historyPage"
-            app:popUpTo="@id/positionPage"/>
+            app:popUpTo="@id/positionPage"
+            />
     </fragment>
 
     <!-- Graph -->
@@ -54,19 +63,25 @@
         android:id="@+id/graphPage"
         android:name="it.unipd.localizer.tabs.Graph"
         android:label="history_page"
-        tools:layout="@layout/graph_page">
+        tools:layout="@layout/graph_page"
+        >
         <action
             android:id="@+id/action_graphPage_to_positionPage"
             app:destination="@id/positionPage"
-            app:popUpTo="@id/positionPage"/>
+            app:popUpTo="@id/positionPage"
+            app:popUpToInclusive="true"
+            />
         <action
             android:id="@+id/action_graphPage_to_historyPage"
             app:destination="@id/historyPage"
-            app:popUpTo="@id/historyPage"/>
+            app:popUpTo="@id/positionPage"
+            />
         <action
             android:id="@+id/action_graphPage_to_graphPage"
             app:destination="@id/graphPage"
-            app:popUpTo="@id/graphPage"/>
+            app:popUpTo="@id/graphPage"
+            app:popUpToInclusive="true"
+            />
     </fragment>
 
     <!-- Details -->
@@ -74,18 +89,24 @@
         android:id="@+id/locationDetail"
         android:name="it.unipd.localizer.tabs.Details"
         android:label="details_page"
-        tools:layout="@layout/location_detail">
+        tools:layout="@layout/location_detail"
+        >
         <action
             android:id="@+id/action_detailPage_to_historyPage"
             app:destination="@id/historyPage"
-            app:popUpTo="@id/historyPage"/>
+            app:popUpTo="@id/historyPage"
+            app:popUpToInclusive="true"
+            />
         <action
             android:id="@+id/action_detailPage_to_detailPage"
             app:destination="@id/locationDetail"
-            app:popUpTo="@id/historyPage"/>
+            app:popUpTo="@id/historyPage"
+            app:popUpToInclusive="true"
+            />
         <argument
             android:name="location"
-            app:argType="string"/>
+            app:argType="string"
+            />
     </fragment>
 
 </navigation>

@@ -1,18 +1,27 @@
 package it.unipd.localizer
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import it.unipd.localizer.database.LocationEntity
+import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS
 import it.unipd.localizer.tabs.HistoryDirections
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.coroutineContext
 
-class LocationAdapter(private val locationList: List<LocationEntity>) :
+class LocationAdapter(private val locationList: List<LocationEntity>, private val activity: FragmentActivity?) :
 RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
+    //region Shared preferences to start/stop background service button
+    private var persistentState: SharedPreferences? = null
+    private var persistentStateEditor: SharedPreferences.Editor? = null
+    //endregion
 
     companion object{
         const val TIMESTAMP_PATTERN = "dd/MM/yyyy kk:mm:ss.SSS"
@@ -32,10 +41,16 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
 
     // Events on item list
     private val onClickListener = View.OnClickListener { view ->
+        //region Set variable let foreground service working in History.onPause
+        persistentState = activity?.getPreferences(Context.MODE_PRIVATE)
+        persistentStateEditor = persistentState?.edit()
+        persistentStateEditor?.putBoolean(SHOW_DETAILS, true)
+        persistentStateEditor?.apply()
+        //endregion
+
         val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()
         val seeDetails = HistoryDirections.actionHistoryPageToDetailPage(locationDateTime)
         Navigation.findNavController(view).navigate(seeDetails)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationViewHolder {

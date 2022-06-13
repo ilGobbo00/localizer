@@ -7,7 +7,6 @@
     <string name="history_tab">history</string>
     <string name="graph_tab">graph</string>
     <string name="position_tab">position</string>
-    <string name="title_activity_main" translatable="false">MainActivity</string>
     <string name="position_main_label">current position</string>
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>
@@ -29,7 +28,6 @@
     <string name="altitude_label">Altitude</string>
     <string name="num_of_element">Number of element <![CDATA[<b> %1$d </b>]]> </string>
     <string name="num_of_element_compat">Number of elements %1$d</string>
-    <string name="stop_background_service">Stop background service</string>
     <string name="start_background_service">Start background service</string>
     <string name="running_service" translatable="false">start</string>
     <string name="service_not_running" translatable="false">stop</string>
@@ -40,8 +38,6 @@
     <string name="app_description">Locations are being saved</string>
     <string name="delete_locations" translatable="false">delete_locations</string>
     <string name="delete_all_locations">Delete all location stored</string>
-    <string name="delete_toast">Refresh this page to see the results</string>
-    <string name="unknown">Unknown</string>
     <string name="invalid_location_hint">Can\'t read a deleted location details</string>
     <string name="loading_details">Loading..</string>
     <string name="elements_deleted">All saved items  have been deleted</string>

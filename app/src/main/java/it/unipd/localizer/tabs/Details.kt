@@ -32,6 +32,7 @@ import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
 import it.unipd.localizer.service.BackgroundLocation
+import it.unipd.localizer.tabs.Position.Companion.BACKGROUND_RUNNING
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
@@ -75,8 +76,10 @@ class Details:Fragment(), OnMapReadyCallback {
     companion object{
         // Constant for persistent state
         const val SHOW_DETAILS = "show_details"
+        const val BACK_PRESSED = "back_pressed"
     }
 
+    // Initialize all variables
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -93,23 +96,31 @@ class Details:Fragment(), OnMapReadyCallback {
         dbManager = database.locationDao()
         //endregion
 
-        // Get SharedPreferences reference
+        //region Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
+        //endregion
 
-        // Set background button
+        //region Set background button
         backButton = view?.findViewById(R.id.back_to_list)
         backButton?.setOnClickListener { clickView ->
             val destinationTab = DetailsDirections.actionDetailPageToHistoryPage()
             Navigation.findNavController(clickView).navigate(destinationTab)
             backPressed = true
         }
+        //endregion
 
         //region Reference to labels
         time = view?.findViewById(R.id.location_time_detail)
         latitude = view?.findViewById(R.id.location_latitude_detail)
         longitude = view?.findViewById(R.id.location_longitude_detail)
         altitude = view?.findViewById(R.id.location_altitude_detail)
+        //endregion
+
+        //region Reset variables used to stop foreground service
+        persistentStateEditor.putBoolean(SHOW_DETAILS, false)   // History.onPause
+        persistentStateEditor.putBoolean(BACK_PRESSED, false)   // Details.onPause
+        persistentStateEditor.apply()
         //endregion
 
         // Get parameter passed thought fragment.
@@ -165,8 +176,12 @@ class Details:Fragment(), OnMapReadyCallback {
         return view
     }
 
+    // Check if foreground service must be stopped
     override fun onPause() {
-        val backgroundService = persistentState.getBoolean(Position.BACKGROUND_RUNNING, false)
+        // Get request for foreground service and back button last action
+        val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
+        backPressed = backPressed || persistentState.getBoolean(BACK_PRESSED, false)
+
         // If user exits from the app without requesting foreground service, stop it
         if(!backPressed && !orientationChanged && !backgroundService) {
             val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
@@ -176,6 +191,7 @@ class Details:Fragment(), OnMapReadyCallback {
         super.onPause()
     }
 
+    // Function called on phone rotation
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Navigate selecting autonomously the fragment (with different layout)
@@ -190,7 +206,7 @@ class Details:Fragment(), OnMapReadyCallback {
         locationToDisplay?.let{
             val location = LatLng(locationToDisplay!!.location.latitude, locationToDisplay!!.location.longitude)
             map.addMarker(MarkerOptions().position(location).title("Location"))
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 18f))
         }
     }
 
