@@ -4,9 +4,7 @@ App developped for Embedded systems programming for the course hosted at Univers
 
 ## Installation
 
-To install the app download the APK and open it into eigther phisical or virtual device. 
-
-Google play services have to be installed to make app working.
+To install the app download the APK and open it into eigther phisical or virtual device. You can also install the app downloading the source code and run it with Android Studio.
 
 Android version target: API 29 (Android 10)
 
