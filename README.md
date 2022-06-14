@@ -19,3 +19,6 @@ Android version target: API 29 (Android 10)
 
 ## Device used to test the app
 - **Asus Zenfone 5z** (6.2 2240x1080) with **Android 10** (API 29)
+
+## Screenshots
+[Folder with examples](https://github.com/ilGobbo00/localizer/tree/master/Screenshots)
