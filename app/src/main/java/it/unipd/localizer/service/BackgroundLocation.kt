@@ -12,6 +12,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.*
+import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import it.unipd.localizer.MainActivity.Companion.PERMISSIONS
 import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationDao
@@ -43,7 +44,7 @@ class BackgroundLocation : Service() {
     private val locationCallback = object : LocationCallback() {
         // Called when device location information is available.
         override fun onLocationResult(locationResult : LocationResult){
-            val lastLocation = locationResult.lastLocation
+            val lastLocation = locationResult.lastLocation ?: return
             currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude, lastLocation.altitude)
 
             // Then insert new valid position
@@ -118,7 +119,7 @@ class BackgroundLocation : Service() {
         dbManager = database.locationDao()
 
         val locationRequest: LocationRequest = LocationRequest.create()
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.priority = PRIORITY_HIGH_ACCURACY
         locationRequest.interval = Position.REFRESH_TIME.toLong()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)

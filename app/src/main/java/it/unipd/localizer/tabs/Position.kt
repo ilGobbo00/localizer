@@ -22,6 +22,7 @@ import androidx.core.content.res.ResourcesCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.google.android.gms.location.*
+import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -206,14 +207,14 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
         // Create a location request for requestLocationUpdates
         locationRequest = LocationRequest.create()
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.priority = PRIORITY_HIGH_ACCURACY
         locationRequest.interval = REFRESH_TIME.toLong()
 
         // Creating callback for requestLocationUpdates with location labels references
         locationCallback = object : LocationCallback() {
             // Called when device location information is available.
             override fun onLocationResult(locationResult: LocationResult) {
-                val lastLocation = locationResult.lastLocation
+                val lastLocation = locationResult.lastLocation ?: return
 
                 // Create my location object
                 currentLocation = SimpleLocationItem(
@@ -366,7 +367,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 maxNumLabel.text = Html.fromHtml(getString(R.string.max_num_stored, MAX_SIZE), Html.FROM_HTML_MODE_LEGACY)
             else
-                maxNumLabel.text = getString(R.string.max_num_stored, MAX_SIZE)
+                maxNumLabel.text = getString(R.string.max_num_stored_comp, MAX_SIZE)
     }
 
 }
