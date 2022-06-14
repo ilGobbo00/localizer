@@ -19,7 +19,7 @@ Android version target: API 29 (Android 10)
 
 [App principle flowchart](https://github.com/ilGobbo00/localizer/blob/master/SimpleFlowchart.png)
 
-## Device used to test the app
+## Devices used to test the app
 
 - **Asus Zenfone 5z** (6.2 2240x1080) with **Android 10** (API 29)
 - **Samsung Galaxy S Advance** (4 800x480) with **Android 5.1** (API 22) (screen too small)
