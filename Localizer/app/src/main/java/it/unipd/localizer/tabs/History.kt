@@ -187,7 +187,7 @@ class History : Fragment(), OnMapReadyCallback {
             location = LatLng(avgLat/allLocations.size, avgLong/allLocations.size)
             val cameraPosition = CameraPosition.Builder()
                 .target(location)
-                .zoom(15f)
+                .zoom(12f)
                 .build()
             map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 800, null)
         }

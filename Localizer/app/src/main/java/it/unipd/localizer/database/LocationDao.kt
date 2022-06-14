@@ -16,16 +16,13 @@ interface LocationDao {
         @Query("SELECT * FROM locations WHERE timeStamp = :timestamp")
         suspend fun getLocation(timestamp: Long): LocationEntity?
 
-        @Query("SELECT MIN(timeStamp) FROM locations")
-        suspend fun getOldestTimeSaved() : Long?
+        @Query("DELETE FROM locations")
+        suspend fun deleteAll()
 
         @Transaction
         suspend fun deleteOld(){
                 deleteOld(Date().time, OLDEST_DATA.toLong())
         }
-
-        @Query("DELETE FROM locations")
-        suspend fun deleteAll()
 
         // Deleting data older than 5 minutes
         @Query("DELETE FROM locations WHERE :currentTime - timeStamp > :threshold")
