@@ -124,19 +124,20 @@ class Details:Fragment(), OnMapReadyCallback {
         persistentStateEditor.apply()
         //endregion
 
-        // Get parameter passed thought fragment.
+        // Get parameter passed thought fragment (conversion bijective from unix <--> human data)
         // Use the timestamp (unique) to obtain the element from DB after conversion from human-readable date to epoch
         epochString = DetailsArgs.fromBundle(requireArguments()).location
         val timestamp: Long? = SimpleDateFormat(TIMESTAMP_PATTERN, Locale.ITALY).parse(epochString)?.time
 
         runBlocking{
-            // Display loading text
+            // Display loading text in case of databse long loading time
             time?.text = getString(R.string.loading_details)
             latitude?.text = getString(R.string.loading_details)
             longitude?.text = getString(R.string.loading_details)
             altitude?.text = getString(R.string.loading_details)
 
             launch {
+                // Get location using unique time stamp
                 locationToDisplay = timestamp?.let { dbManager.getLocation(it) }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -168,7 +169,7 @@ class Details:Fragment(), OnMapReadyCallback {
                 time?.text = Html.fromHtml(getString(R.string.invalid_location_detail, errorDay, errorTime), FROM_HTML_MODE_LEGACY)
             else
                 time?.text = getString(R.string.invalid_location_detail_compat, errorDay, errorTime)
-            latitude?.text = getString(R.string.invalid_location_hint)
+            latitude?.text = getString(R.string.invalid_location_hint)                                // Recycle existing TextViews
             longitude?.text = ""
             altitude?.text = ""
             return view
@@ -192,7 +193,7 @@ class Details:Fragment(), OnMapReadyCallback {
         super.onPause()
     }
 
-    // Function called on phone rotation
+    // Function called on phone rotation (Check comments in Position.kt/onConfigurationChanged)
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Navigate selecting autonomously the fragment (with different layout)
@@ -203,6 +204,7 @@ class Details:Fragment(), OnMapReadyCallback {
         orientationChanged = true
     }
 
+    // Google map callback
     override fun onMapReady(map: GoogleMap) {
         locationToDisplay?.let{
             val location = LatLng(locationToDisplay!!.location.latitude, locationToDisplay!!.location.longitude)

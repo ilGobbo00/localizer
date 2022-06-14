@@ -41,23 +41,27 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class History : Fragment(), OnMapReadyCallback {
-    // Flag used to start/stop requestLocationUpdates
+    //region Flag used to start/stop requestLocationUpdates
     private var switchingTabs = false
     private var orientationChanged = false
+    //endregion
 
-    // Reference to views
+    //region Reference to views
     private lateinit var  positionButton: TextView
     private lateinit var  historyButton: TextView
     private lateinit var  graphButton: TextView
     private lateinit var  deleteButton: FloatingActionButton
+    //endegion
 
-    // Reference to database
+    //region Reference to database
     private lateinit var database : LocationsDatabase
     private lateinit var dbManager : LocationDao
+    //endegion
 
-    // Shared preferences for start/stop background service button
+    //region Shared preferences for start/stop foreground service button
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
+    //endegion
 
     // Google Map fragment
     private lateinit var mapFragment: SupportMapFragment
@@ -70,7 +74,7 @@ class History : Fragment(), OnMapReadyCallback {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.history_page, container, false)
 
-        // Initialize database variables
+        //region Initialize database variables
         try {
             database = LocationsDatabase.getDatabase(requireContext())
         }catch (e: java.lang.IllegalStateException){
@@ -79,20 +83,23 @@ class History : Fragment(), OnMapReadyCallback {
             return view
         }
         dbManager = database.locationDao()
+        //endregion
 
-        // Get SharedPreferences reference
+        //region Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
+        //endregion
 
-        // Views references
+        //region Views references
         positionButton = view.findViewById(R.id.position_button)
         historyButton = view.findViewById(R.id.history_button)
         graphButton = view.findViewById(R.id.graph_button)
         deleteButton = view.findViewById(R.id.delete_all_locations)
+        //endregion
 
+
+        //region "Buttons" actions
         switchingTabs = false
-
-        // Buttons actions
         positionButton.setOnClickListener { v ->
             val destinationTab = HistoryDirections.actionHistoryPageToPositionPage()
             Navigation.findNavController(v).navigate(destinationTab)
@@ -123,6 +130,7 @@ class History : Fragment(), OnMapReadyCallback {
             Toast.makeText(context, getString(R.string.delete_warning), Toast.LENGTH_LONG).show()
             true
         }
+        //endregion
 
         val elementNum: TextView? = view?.findViewById(R.id.number_element_label)
         val recyclerView: RecyclerView = view.findViewById(R.id.locations_list)
@@ -131,7 +139,7 @@ class History : Fragment(), OnMapReadyCallback {
             elementNum?.text = getString(R.string.loading_details)
             launch{
                 allLocations = dbManager.getAllLocations()                          // Get all stored locations
-                recyclerView.adapter = LocationAdapter(allLocations, activity)
+                recyclerView.adapter = LocationAdapter(allLocations, activity)      // And populate the recycleview
 
                 // Display the number of stored items
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -154,7 +162,9 @@ class History : Fragment(), OnMapReadyCallback {
     // Check if foreground service must be stopped
     override fun onPause() {
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
-        val showDetails = persistentState.getBoolean(SHOW_DETAILS, false)
+        val showDetails = persistentState.getBoolean(SHOW_DETAILS, false)                           // Flag if location_detail will be displayed
+
+        // Stop service if user exits from the app without enabling foreground service
         if(!switchingTabs && !backgroundService && !orientationChanged && !showDetails) {
             val backgroundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
             backgroundIntent.putExtra(ForegroundLocation.FOREGROUND_SERVICE, false)
@@ -164,6 +174,7 @@ class History : Fragment(), OnMapReadyCallback {
         super.onPause()
     }
 
+    // Check comments in Position.kt/onConfigurationChanged
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         val destinationTab = HistoryDirections.actionHistoryPageToHistoryPage()
@@ -177,6 +188,8 @@ class History : Fragment(), OnMapReadyCallback {
         var location: LatLng
         var avgLat = 0.0
         var avgLong = 0.0
+
+        // Add a marker into the map for every location and find a average latidute and longitude (for the map camera)
         for(l in allLocations){
             avgLat += l.location.latitude
             avgLong += l.location.longitude
@@ -184,7 +197,7 @@ class History : Fragment(), OnMapReadyCallback {
             map.addMarker(MarkerOptions().position(location).title("Location n.${allLocations.indexOf(l)}"))
         }
         if(allLocations.isNotEmpty()){
-            location = LatLng(avgLat/allLocations.size, avgLong/allLocations.size)
+            location = LatLng(avgLat/allLocations.size, avgLong/allLocations.size)  // Average location
             val cameraPosition = CameraPosition.Builder()
                 .target(location)
                 .zoom(12f)

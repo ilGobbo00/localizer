@@ -49,13 +49,13 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     private lateinit var graphButton: TextView
     //endregion
 
-    //region Flag used to start/stop requestLocationUpdates
+    //region Flag used to start/stop requestLocationUpdates on onStop
     private var switchingTabs = false
     private var orientationChanged = false
     //endregion
 
-    //region Background service button
-    private lateinit var backgroundButton: FloatingActionButton
+    //region Foreground service button
+    private lateinit var foregroundButton: FloatingActionButton
     //endregion
 
     //region Variables for location methods
@@ -72,10 +72,10 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     private lateinit var maxNumLabel: TextView
     //endregion
 
-    // Variable to enable background service
-    private var backgroundService = false
+    // Variable to enable foreground service
+    private var foregroundService = false
 
-    //region Shared preferences for start/stop background service button
+    //region Shared preferences to start/stop foreground service button
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
     //endregion
@@ -98,12 +98,13 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             }
 
         const val REFRESH_TIME = 1000                       // Read location every 1s
-        // Constant for persistentState
+        //region Constants for persistentState
         const val BACKGROUND_RUNNING = "background_active"
         const val MAX_MINUTE = "max_minute"
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
         const val ALTITUDE= "altitude"
+        //endregion
     }
 
     @SuppressLint("MissingPermission")
@@ -112,7 +113,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
                                savedInstanceState: Bundle? ): View? {
         val view = inflater.inflate(R.layout.position_page, container, false)
 
-        // Reference to database repository
+        //region Get database and Dao instances
         try {
             database = LocationsDatabase.getDatabase(requireContext())
         }catch (e: java.lang.IllegalStateException){
@@ -121,35 +122,39 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             return view
         }
         dbManager = database.locationDao()
+        //endregion
 
-        // Get SharedPreferences reference
+        //region SharedPreferences reference
         persistentState = requireActivity().getPreferences(MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
+        //endregion
 
-        // Tabs references
+        //region Tabs references
         historyButton = view.findViewById(R.id.history_button)
         graphButton = view.findViewById(R.id.graph_button)
-        backgroundButton = view.findViewById(R.id.start_stop_background_service)
+        foregroundButton = view.findViewById(R.id.start_stop_background_service)
+        //endregion
 
-        // Number picker
+        //region Number picker settings
         minuteSelector = view.findViewById(R.id.minute_selector)
         minuteSelector.setOnValueChangedListener(this)
         minuteSelector.minValue = 1
         minuteSelector.maxValue = 10
         minuteSelector.value = persistentState.getInt(MAX_MINUTE,5)
         minuteSelector.isClickable
+        //endregion
 
         // Update max stored data age
         OLDEST_DATA = persistentState.getInt(MAX_MINUTE, 5)
 
-        // Update label with current data
+        // Update list size label with current data
         maxNumLabel = view.findViewById(R.id.max_size)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             maxNumLabel.text = Html.fromHtml(getString(R.string.max_num_stored, MAX_SIZE), Html.FROM_HTML_MODE_LEGACY)
         else
             maxNumLabel.text = getString(R.string.max_num_stored_comp, MAX_SIZE)
 
-        // Set buttons actions
+        //region Set "buttons" actions
         switchingTabs = false
         historyButton.setOnClickListener { v ->
             val destinationTab = PositionDirections.actionPositionPageToHistoryPage()
@@ -161,7 +166,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             Navigation.findNavController(v).navigate(destinationTab)
             switchingTabs = true
         }
-        backgroundButton.setOnClickListener { v ->
+        foregroundButton.setOnClickListener { v ->
             if (v.tag == getString(R.string.service_not_running)) {
                 // Run background service
                 Log.i("Localizer/P", "Request to RUN background service")
@@ -178,11 +183,12 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
                 Toast.makeText(requireContext(), getString(R.string.stopping_background_service), LENGTH_SHORT ).show()
             }
         }
-        backgroundButton.setOnLongClickListener {
+        foregroundButton.setOnLongClickListener {
             Toast.makeText(context, getString(R.string.background_button_hint), LENGTH_SHORT)
                 .show()
             true
         }
+        //endregion
 
         // Try to create a fusedLocationClient
         try {
@@ -193,10 +199,11 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             return view
         }
 
-        // Get reference to location fields
+        //region Get reference to location fields
         latitudeField = view.findViewById(R.id.latitude_field)
         longitudeField = view.findViewById(R.id.longitude_field)
         altitudeField = view.findViewById(R.id.altitude_field)
+        //endregion
 
         // Show details of last location read
         if (persistentState.getString(LATITUDE, null) != null) {
@@ -205,10 +212,11 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             altitudeField?.text = persistentState.getString(ALTITUDE, "Invalid data")
         }
 
-        // Create a location request for requestLocationUpdates
+        //region Create a location request for requestLocationUpdates
         locationRequest = LocationRequest.create()
         locationRequest.priority = PRIORITY_HIGH_ACCURACY
         locationRequest.interval = REFRESH_TIME.toLong()
+        //endregion
 
         // Creating callback for requestLocationUpdates with location labels references
         locationCallback = object : LocationCallback() {
@@ -272,9 +280,10 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
 
     @SuppressLint("MissingPermission")          // Already checked in Activity lifecycle
     override fun onResume() {
-        // Check permissions every time fragment starts
+        // Check permissions every time fragment starts (request permissions if user revokes them after opening the app)
         if(persistentState.getBoolean(PERMISSIONS, false)){
-            // Needed block to start service after getting permissions
+
+            // Block needed to start main service after getting permissions (onPause --> Permission window --> onResume)
             if(!persistentState.getBoolean(SERVICE_RUNNING, false)){
                 Log.i("Localizer/P","requestLocationUpdates onResume")
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, requireContext().mainLooper)
@@ -293,13 +302,12 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     }
 
     override fun onStop() {
-        // Stop location updates from reading position (avoid multiple processes creating a new fragment)
+        // Stop requestLocationUpdates from reading position (avoid multiple processes creating a new fragment)
         fusedLocationClient.removeLocationUpdates(locationCallback)
         persistentStateEditor.putBoolean(SERVICE_RUNNING, false)
 
-        // If user change tab displayed or exits after starting "background" service, enable foreground service
-        if(switchingTabs || (!switchingTabs && backgroundService)) {
-            // If user enable background service start it
+        // If user change displayed tab or exits from the app after enabling foreground service, start foreground service
+        if(switchingTabs || (!switchingTabs && foregroundService)) {
             Log.i("Localizer/P", "onStop, start foreground service")
             val foregorundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
             foregorundIntent.putExtra(FOREGROUND_SERVICE, true)
@@ -307,7 +315,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             requireContext().startService(foregorundIntent)
         }
 
-        // If user exit from the app, remove last location data read, else save its fields
+        // If user exit from the app, remove last location data read, else save its fields (to avoid "Invalid data")
         if(!switchingTabs && !orientationChanged){
             persistentStateEditor.remove(LATITUDE)
             persistentStateEditor.remove(LONGITUDE)
@@ -328,15 +336,15 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     // Update fab button based on foreground service status
     private fun updateFAB() {
         if (!persistentState.getBoolean(BACKGROUND_RUNNING, false)){
-            backgroundService = false
-            backgroundButton.setImageResource(R.drawable.start)
-            backgroundButton.backgroundTintList = ColorStateList.valueOf(getColor(resources,R.color.teal_200, null))
-            backgroundButton.tag = getString(R.string.service_not_running)
+            foregroundService = false
+            foregroundButton.setImageResource(R.drawable.start)
+            foregroundButton.backgroundTintList = ColorStateList.valueOf(getColor(resources,R.color.teal_200, null))
+            foregroundButton.tag = getString(R.string.service_not_running)
         }else {
-            backgroundService = true
-            backgroundButton.setImageResource(R.drawable.stop)
-            backgroundButton.backgroundTintList = ColorStateList.valueOf(Color.RED)
-            backgroundButton.tag = getString(R.string.running_service)
+            foregroundService = true
+            foregroundButton.setImageResource(R.drawable.stop)
+            foregroundButton.backgroundTintList = ColorStateList.valueOf(Color.RED)
+            foregroundButton.tag = getString(R.string.running_service)
         }
     }
 
@@ -344,6 +352,7 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Navigate to the fragment selected autonomously by android
+        // (/land/position_page isn't displayed after rotation from portrait)
         val destinationTab = PositionDirections.actionPositionPageToPositionPage()
         try {
             Navigation.findNavController(requireView()).navigate(destinationTab)
@@ -368,6 +377,5 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             else
                 maxNumLabel.text = getString(R.string.max_num_stored_comp, MAX_SIZE)
     }
-
 }
 

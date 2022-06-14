@@ -63,9 +63,10 @@ class Graph : Fragment(){
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.graph_page, container, false)
-        // Get SharedPreferences reference
+        //region Get SharedPreferences reference
         persistentState = requireActivity().getPreferences(Context.MODE_PRIVATE)
         persistentStateEditor = persistentState.edit()
+        //endregion
 
         //region Database section
         try {
@@ -127,6 +128,7 @@ class Graph : Fragment(){
         val chart1Title: TextView = view.findViewById(R.id.locations_chart_title)
         val chart2Title: TextView = view.findViewById(R.id.altitude_chart_title)
 
+        // Different text for few data available
         if(locationsList.size < 2){
             val noDataLabel: TextView = view.findViewById(R.id.not_enough_data)
             if(locationsList.isEmpty())
@@ -145,6 +147,8 @@ class Graph : Fragment(){
         val dataSetChart2: LineDataSet
         when(resources.configuration.orientation){
            ORIENTATION_PORTRAIT -> {
+               // Chart1 -> meters traveled between locations
+               // Chart2 -> altitude trend
                var nextLoc: SimpleLocationItem
                for(i in IntRange(0, locationsList.size-2) ) {
                    // Location 1
@@ -154,7 +158,7 @@ class Graph : Fragment(){
 
                    distanceBetween(currentLoc.latitude, currentLoc.longitude, nextLoc.latitude, nextLoc.longitude, distance)
                    entriesChart1.add(Entry(i.toFloat(), distance[0]))
-                   entriesChart2.add(Entry(i.toFloat(), (/*nextLoc.altitude - */currentLoc.altitude).toFloat() ))
+                   entriesChart2.add(Entry(i.toFloat(), (currentLoc.altitude).toFloat()))
                }
                // Get last entry for altitude chart
                entriesChart2.add(Entry((locationsList.size-1).toFloat(), locationsList[locationsList.size-1].location.altitude.toFloat()))
@@ -163,20 +167,20 @@ class Graph : Fragment(){
                dataSetChart2 = LineDataSet(entriesChart2, "Altitude trend [m]")
            }
             else -> {
+                // Chart1 -> Latitude trend
+                // Chart2 -> Longitude trend
                 for(i in IntRange(0, locationsList.size-1)) {
                     currentLoc = locationsList[i].location
                     entriesChart1.add(Entry(i.toFloat(), currentLoc.latitude.toFloat()))
                     entriesChart2.add(Entry(i.toFloat(), currentLoc.longitude.toFloat()))
                 }
 
-                // Get last entry for altitude chart
-                entriesChart2.add(Entry((locationsList.size-1).toFloat(), locationsList[locationsList.size-1].location.altitude.toFloat()))
-
                 dataSetChart1 = LineDataSet(entriesChart1, "Latitude")
                 dataSetChart2 = LineDataSet(entriesChart2, "Longitude")
             }
         }
 
+        // Adding styles chart line
         dataAddStyles(dataSetChart1)
         dataAddStyles(dataSetChart2)
 
@@ -217,6 +221,7 @@ class Graph : Fragment(){
     // Check if foreground service must be stopped
     override fun onPause() {
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
+
         // If user exits from the app without requesting foreground service, stop it
         if(!switchingTabs && !backgroundService && !orientationChanged) {
             val backgroundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
@@ -227,7 +232,7 @@ class Graph : Fragment(){
         super.onPause()
     }
 
-    // Called when orientation changes
+    // Called when orientation changes (Check comments in Position.kt/onConfigurationChanged)
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Navigate selecting autonomously the fragment (with different layout)

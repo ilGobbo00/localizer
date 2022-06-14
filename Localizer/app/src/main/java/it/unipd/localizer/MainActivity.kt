@@ -12,8 +12,10 @@ import androidx.core.content.ContextCompat
 import it.unipd.localizer.tabs.Details.Companion.BACK_PRESSED
 
 class MainActivity : AppCompatActivity() {
+    //region Peristent state varables
     private lateinit var persistentState: SharedPreferences
     private lateinit var persistentStateEditor: SharedPreferences.Editor
+    //endregion
 
     // Flag for permissions management
     private var permissionObtained = false
@@ -52,8 +54,7 @@ class MainActivity : AppCompatActivity() {
             locationPermissionRequest.launch(arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
                 locationPermissionRequest.launch(arrayOf(FOREGROUND_SERVICE))
-        }else
-            Log.i("Localizer/MA", "Permissions already got")
+        }
 
         super.onStart()
     }

@@ -42,7 +42,6 @@ class ForegroundLocation : Service() {
 
     // Callback for requestLocationUpdates
     private val locationCallback = object : LocationCallback() {
-        // Called when device location information is available.
         override fun onLocationResult(locationResult : LocationResult){
             val lastLocation = locationResult.lastLocation ?: return
             currentLocation = SimpleLocationItem(lastLocation.latitude, lastLocation.longitude, lastLocation.altitude)
@@ -60,6 +59,7 @@ class ForegroundLocation : Service() {
                     dbManager.insertLocation(entry)
                 }
                 launch {
+                    // Check for data to delete
                     val locationList = dbManager.getAllLocations()
                     if (locationList.size > Position.MAX_SIZE) {
                         Log.i("Localizer/F", "Deleting oldest data..")
@@ -100,16 +100,20 @@ class ForegroundLocation : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         permissionsObtained = intent?.getBooleanExtra(PERMISSIONS, false) ?: false
         serviceActiveNewRequest = intent?.getBooleanExtra(FOREGROUND_SERVICE, false) ?: false
-        if(serviceActiveNewRequest && permissionsObtained) {
+
+        // If it was requested to start foregorund service and app has permissions, start foreground service
+        return if(serviceActiveNewRequest && permissionsObtained) {
             foregroundLocalizer()
-        }
-        return START_REDELIVER_INTENT
+            START_REDELIVER_INTENT
+        }else
+            START_NOT_STICKY
     }
 
     @SuppressLint("MissingPermission") // If here, permissions are already obtained
     private fun foregroundLocalizer(){
         Log.i("Localizer/F", "Start foreground service")
 
+        //region Database reference
         try {
             database = LocationsDatabase.getDatabase(applicationContext)
         }catch (e: java.lang.IllegalStateException){
@@ -117,10 +121,13 @@ class ForegroundLocation : Service() {
             return
         }
         dbManager = database.locationDao()
+        //endregion
 
+        //region Create a location request
         val locationRequest: LocationRequest = LocationRequest.create()
         locationRequest.priority = PRIORITY_HIGH_ACCURACY
         locationRequest.interval = Position.REFRESH_TIME.toLong()
+        //endregion
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
 
@@ -147,7 +154,7 @@ class ForegroundLocation : Service() {
 
     override fun onDestroy() {
         Log.d("Localizer/F", "Stop foreground service")
-        if(this::fusedLocationClient.isInitialized)
+        if(this::fusedLocationClient.isInitialized)                         // Check possible errors
             fusedLocationClient.removeLocationUpdates(locationCallback)
         stopForeground(true)
         super.onDestroy()

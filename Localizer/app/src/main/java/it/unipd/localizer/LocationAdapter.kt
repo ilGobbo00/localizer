@@ -23,17 +23,19 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
     //endregion
 
     companion object{
+        //region Constants for Details.kt
         const val TIMESTAMP_PATTERN = "dd/MM/yyyy kk:mm:ss.SSS"
         const val DAY_PATTERN = "dd/MM/yyyy"
         const val HOUR_PATTERN = "kk:mm:ss.SSS"
+        //endregion
     }
 
     class LocationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val locationLabel: TextView = itemView.findViewById(R.id.location_label)
-        private val locationNum: TextView = itemView.findViewById(R.id.location_num)
+        private val locationNum: TextView = itemView.findViewById(R.id.location_num)        // Index
+        private val locationLabel: TextView = itemView.findViewById(R.id.location_label)    // Timestamp
 
         fun bind(position: Int, word: String) {
-            locationNum.text = position.plus(1).toString()
+            locationNum.text = position.plus(1).toString()                              // Start from 1
             locationLabel.text = word
         }
     }
@@ -47,6 +49,7 @@ RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){
         persistentStateEditor?.apply()
         //endregion
 
+        // Get the human readable timestamp and send it to the details fragment
         val locationDateTime = view.findViewById<TextView>(R.id.location_label).text.toString()
         val seeDetails = HistoryDirections.actionHistoryPageToDetailPage(locationDateTime)
         Navigation.findNavController(view).navigate(seeDetails)
