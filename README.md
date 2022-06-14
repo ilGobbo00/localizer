@@ -21,9 +21,10 @@ Android version target: API 29 (Android 10)
 
 ## Devices used to test the app
 
-- **Asus Zenfone 5z** (6.2'' 2240x1080) with **Android 10** (API 29)  <== ***Suggested***
-- **Pixel 3** (virtual) (5.46'' 1080x2160) with **Android 10** (API 29)             <== ***Suggested***
+- **Asus Zenfone 5z** (6.2'' 2240x1080) with **Android 10** (API 29)      <== ***Suggested***
+- **Samsung Galaxy A5** (SMA500FU) (5'' 720x1280) with **Android 6.0** (API 23)  
 - **Samsung Galaxy S Advance** (4'' 800x480) with **Android 5.1** (API 22) (screen too small)
+- **Pixel 3** (virtual) (5.46'' 1080x2160) with **Android 10** (API 29)   <== ***Suggested***
 - **Pixel** (virtual) (5'' 1080x1920) with **Android 5.1** (API 22)
 - **Galaxy Nexsus** (virtual) (4.65'' 720x1280) with **Android 5.0** (API 21) 
 
