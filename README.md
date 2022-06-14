@@ -1,6 +1,6 @@
 # Localizer
 
-App developped for Embedded systems programming for the course hosted at University of Padua. 
+App developped for Embedded systems programming for the course hosted at University of Padua. The main aim is reading, storing and displaying locations read every T seconds (with T>=1s). The locations have to be read and stored also if the UI isn't displayed (so foreground service is requiered). The app doesn't need to read and store locations after reboot but it has to restart in a consistent state. 
 
 ## Installation
 
