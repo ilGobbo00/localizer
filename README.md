@@ -13,7 +13,7 @@ Android version target: API 29 (Android 10)
 1. Google play services 
 2. Minimum Android version required: API 21 (Android 5.0) (**Suggested version target**)
 3. 4.65'' minimum screen size (**Suggested 6.2''**)
-4. A working MAPS_API_KEY into local.proprieties (***MAPS_API_KEY=<api_key>***)
+4. A working MAPS_API_KEY into `Localizer/local.proprieties` (***MAPS_API_KEY=<api_key>***) (check the example)
 
 ## Flowchart
 
