@@ -5,7 +5,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 
-// Class to convert my location for the database management
+// Class to convert SimpleLocationItem for the database management
 class Converters {
     @TypeConverter
     fun fromLocation(location: SimpleLocationItem?): String?{
@@ -17,7 +17,7 @@ class Converters {
         return try{
             Gson().fromJson(string, SimpleLocationItem::class.java)
         }catch (e: JsonSyntaxException){
-            Log.d("Execution", "Failed to convert json -> LocationItem $string")
+            Log.d("Localizer/C", "Failed to convert json -> SimpleLocationItem $string")
             null
         }
     }
