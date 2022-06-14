@@ -12,7 +12,7 @@ Android version target: API 29 (Android 10)
 
 1. Google play services 
 2. Minimum Android version required: API 21 (Android 5.0)
-3. 4.65'' minimum screen size
+3. 4.65'' minimum screen size (**Suggested 6.2''**)
 4. A working MAPS_API_KEY into local.proprieties (***MAPS_API_KEY=<api_key>***)
 
 ## Flowchart
@@ -21,10 +21,15 @@ Android version target: API 29 (Android 10)
 
 ## Devices used to test the app
 
-- **Asus Zenfone 5z** (6.2 2240x1080) with **Android 10** (API 29)
-- **Samsung Galaxy S Advance** (4 800x480) with **Android 5.1** (API 22) (screen too small)
-- **Pixel** (virtual) (5.0 1080x1920) with **Android 5.1** (API 22)
-- **Galaxy Nexsus** (virtual) (4.65 720x1280) with **Android 5.0** (API 21) 
+- **Asus Zenfone 5z** (6.2'' 2240x1080) with **Android 10** (API 29)  <== ***Suggested***
+- **Pixel 3** (virtual) (5.46'' 1080x2160) with **Android 10** (API 29)             <== ***Suggested***
+- **Samsung Galaxy S Advance** (4'' 800x480) with **Android 5.1** (API 22) (screen too small)
+- **Pixel** (virtual) (5'' 1080x1920) with **Android 5.1** (API 22)
+- **Galaxy Nexsus** (virtual) (4.65'' 720x1280) with **Android 5.0** (API 21) 
+
+## Logs
+
+To display only the logs related to the app, in Logcat select *Verbose* and write in the search bar `Localizer/` and the letter after `/` indicates the fragment where log was generated.
 
 ## Screenshots
 
