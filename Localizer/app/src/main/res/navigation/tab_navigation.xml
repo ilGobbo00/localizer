@@ -100,7 +100,7 @@
         <action
             android:id="@+id/action_detailPage_to_detailPage"
             app:destination="@id/locationDetail"
-            app:popUpTo="@id/historyPage"
+            app:popUpTo="@id/locationDetail"
             app:popUpToInclusive="true"
             />
         <argument
