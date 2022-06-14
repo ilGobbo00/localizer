@@ -27,7 +27,7 @@ import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
 import it.unipd.localizer.database.SimpleLocationItem
-import it.unipd.localizer.service.BackgroundLocation
+import it.unipd.localizer.service.ForegroundLocation
 import it.unipd.localizer.tabs.Position.Companion.BACKGROUND_RUNNING
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -219,8 +219,8 @@ class Graph : Fragment(){
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
         // If user exits from the app without requesting foreground service, stop it
         if(!switchingTabs && !backgroundService && !orientationChanged) {
-            val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
-            backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
+            val backgroundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
+            backgroundIntent.putExtra(ForegroundLocation.FOREGROUND_SERVICE, false)
             requireContext().stopService(backgroundIntent)
         }
 

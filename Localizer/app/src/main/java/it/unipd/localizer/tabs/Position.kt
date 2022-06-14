@@ -33,8 +33,8 @@ import it.unipd.localizer.database.LocationDao
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
 import it.unipd.localizer.database.SimpleLocationItem
-import it.unipd.localizer.service.BackgroundLocation
-import it.unipd.localizer.service.BackgroundLocation.Companion.BACKGROUND_SERVICE
+import it.unipd.localizer.service.ForegroundLocation
+import it.unipd.localizer.service.ForegroundLocation.Companion.FOREGROUND_SERVICE
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -261,9 +261,9 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
     @SuppressLint("MissingPermission")          // Already checked in Activity lifecycle
     override fun onStart() {
         // Stop foreground service when the position fragment is displayed. It can be resumed later into onStop
-        val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
-        backgroundIntent.putExtra(BACKGROUND_SERVICE, false)
-        requireContext().stopService(backgroundIntent)              // Nothing happened if service isn't running
+        val foregroundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
+        foregroundIntent.putExtra(FOREGROUND_SERVICE, false)
+        requireContext().stopService(foregroundIntent)              // Nothing happened if service isn't running
 
         persistentStateEditor.apply()
 
@@ -301,10 +301,10 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
         if(switchingTabs || (!switchingTabs && backgroundService)) {
             // If user enable background service start it
             Log.i("Localizer/P", "onStop, start foreground service")
-            val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
-            backgroundIntent.putExtra(BACKGROUND_SERVICE, true)
-            backgroundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
-            requireContext().startService(backgroundIntent)
+            val foregorundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
+            foregorundIntent.putExtra(FOREGROUND_SERVICE, true)
+            foregorundIntent.putExtra(PERMISSIONS, persistentState.getBoolean(PERMISSIONS, false))
+            requireContext().startService(foregorundIntent)
         }
 
         // If user exit from the app, remove last location data read, else save its fields
@@ -333,7 +333,6 @@ class Position : Fragment(), NumberPicker.OnValueChangeListener {
             backgroundButton.backgroundTintList = ColorStateList.valueOf(getColor(resources,R.color.teal_200, null))
             backgroundButton.tag = getString(R.string.service_not_running)
         }else {
-            Log.d("Localizer/P", "Persistent state data found")
             backgroundService = true
             backgroundButton.setImageResource(R.drawable.stop)
             backgroundButton.backgroundTintList = ColorStateList.valueOf(Color.RED)

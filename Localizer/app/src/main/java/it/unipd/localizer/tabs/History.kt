@@ -34,7 +34,7 @@ import it.unipd.localizer.LocationAdapter
 import it.unipd.localizer.R
 import it.unipd.localizer.database.LocationEntity
 import it.unipd.localizer.database.LocationsDatabase
-import it.unipd.localizer.service.BackgroundLocation
+import it.unipd.localizer.service.ForegroundLocation
 import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS
 import it.unipd.localizer.tabs.Position.Companion.BACKGROUND_RUNNING
 import kotlinx.coroutines.launch
@@ -156,8 +156,8 @@ class History : Fragment(), OnMapReadyCallback {
         val backgroundService = persistentState.getBoolean(BACKGROUND_RUNNING, false)
         val showDetails = persistentState.getBoolean(SHOW_DETAILS, false)
         if(!switchingTabs && !backgroundService && !orientationChanged && !showDetails) {
-            val backgroundIntent = Intent(activity?.applicationContext, BackgroundLocation::class.java)
-            backgroundIntent.putExtra(BackgroundLocation.BACKGROUND_SERVICE, false)
+            val backgroundIntent = Intent(activity?.applicationContext, ForegroundLocation::class.java)
+            backgroundIntent.putExtra(ForegroundLocation.FOREGROUND_SERVICE, false)
             requireContext().stopService(backgroundIntent)
         }
 

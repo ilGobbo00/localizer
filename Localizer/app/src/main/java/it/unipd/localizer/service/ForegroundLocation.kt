@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 // Class for foreground service
-class BackgroundLocation : Service() {
+class ForegroundLocation : Service() {
     //region Flags for permissions and service status
     private var serviceActiveNewRequest = false
     private var permissionsObtained = false
@@ -73,7 +73,7 @@ class BackgroundLocation : Service() {
 
     companion object {
         //region Persistent state keys
-        const val BACKGROUND_SERVICE = "background_service"
+        const val FOREGROUND_SERVICE = "background_service"
         const val CHANNEL_ID = "localizer_channel"
         //endregion
     }
@@ -99,14 +99,14 @@ class BackgroundLocation : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         permissionsObtained = intent?.getBooleanExtra(PERMISSIONS, false) ?: false
-        serviceActiveNewRequest = intent?.getBooleanExtra(BACKGROUND_SERVICE, false) ?: false
+        serviceActiveNewRequest = intent?.getBooleanExtra(FOREGROUND_SERVICE, false) ?: false
         if(serviceActiveNewRequest && permissionsObtained) {
             foregroundLocalizer()
         }
         return START_REDELIVER_INTENT
     }
 
-    @SuppressLint("MissingPermission") // If here permissions are already obtained
+    @SuppressLint("MissingPermission") // If here, permissions are already obtained
     private fun foregroundLocalizer(){
         Log.i("Localizer/F", "Start foreground service")
 
