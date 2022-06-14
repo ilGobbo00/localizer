@@ -24,7 +24,7 @@ interface LocationDao {
                 deleteOld(Date().time, OLDEST_DATA.toLong())
         }
 
-        // Deleting data older than 5 minutes
+        // Deleting data older than threshold
         @Query("DELETE FROM locations WHERE :currentTime - timeStamp > :threshold")
         suspend fun deleteOld(currentTime: Long, threshold: Long)
 
