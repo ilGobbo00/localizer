@@ -20,7 +20,7 @@
     <string name="altitude_read_detail_compat">Altitudine: %1$s</string>
     <string name="altitude_label">Altitudine</string>
     <string name="delete_warning">Clicca il bottone per eliminare tutte le posizioni salvate</string>
-    <string name="background_button_hint">Inizia/ferma la lettura delle applicazioni in background</string>
+    <string name="background_button_hint">Abilita/disabilita la lettura delle posizioni in background</string>
     <string name="max_number_data">Numero massimo di posizioni salvate: %1$d</string>
     <string name="max_minute_label">Seleziona il numero di minuti\ndella posizione più vecchia salvata</string>
     <string name="max_num_stored_comp">Numero massimo di posizioni salvate: %1$d</string>
@@ -38,9 +38,9 @@
     <string name="invalid_location_hint">Impossibile leggere i dettagli della posizione</string>
     <string name="delete_all_locations">Cancella tutte le posizioni salvate</string>
     <string name="app_description">Salvataggio delle posizioni</string>
-    <string name="start_background_service">Start servizio in background</string>
-    <string name="starting_background_service">Servizo in background partito!</string>
-    <string name="stopping_background_service">Servizio in background fermato!</string>
+    <string name="start_background_service">Servizio in background abilitato</string>
+    <string name="starting_background_service">Servizo in background abilitato!</string>
+    <string name="stopping_background_service">Servizio in background disabilitato!</string>
     <string name="channel_description">Notifica Localizer sul servizio in background</string>
     <string name="channel_name">Servizio in background Localizer</string>
     <string name="num_of_element">"Numero elementi <![CDATA[<b> %1$d </b>]]> "</string>

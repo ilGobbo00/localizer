@@ -14,7 +14,6 @@ import it.unipd.localizer.tabs.Details.Companion.SHOW_DETAILS
 import it.unipd.localizer.tabs.HistoryDirections
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.coroutines.coroutineContext
 
 class LocationAdapter(private val locationList: List<LocationEntity>, private val activity: FragmentActivity?) :
 RecyclerView.Adapter<LocationAdapter.LocationViewHolder>(){

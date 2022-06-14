@@ -12,27 +12,27 @@
     <string name="longitude_label">Longitude</string>
     <string name="invalid_home_data">Invalid data</string>
     <string name="invalid_position_label" translatable="false">None</string>
-    <string name="location_details_title_error">Error reading \nlocation details</string>
-    <string name="invalid_location_detail">Unable to get location read on<![CDATA[<br><b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
+    <string name="location_details_title_error">Error reading\nlocation details</string>
+    <string name="invalid_location_detail">Unable to get location read on\n<![CDATA[<b>%1$s</b>]]> at <![CDATA[<b>%2$s</b>]]></string>
     <string name="invalid_location_detail_compat">"Unable to get location read on %1$s at  %2$s "</string>
     <string name="location_details_title">location details</string>
-    <string name="time_location_detail">Read time: <![CDATA[<b> %1$s </b>]]> at <![CDATA[<b> %2$s </b>]]></string>
-    <string name="latitude_read_detail">Latitude read: <![CDATA[<b> %1$s </b>]]></string>
-    <string name="longitude_read_detail">Longitude read: <![CDATA[<b> %1$s </b>]]></string>
-    <string name="altitude_read_detail">Altitude read: <![CDATA[<b> %1$s </b>]]></string>
+    <string name="time_location_detail">Read time: <![CDATA[<b>%1$s</b>]]> at <![CDATA[<b>%2$s</b>]]></string>
+    <string name="latitude_read_detail">Latitude read: <![CDATA[<b>%1$s</b>]]></string>
+    <string name="longitude_read_detail">Longitude read: <![CDATA[<b>%1$s</b>]]></string>
+    <string name="altitude_read_detail">Altitude read: <![CDATA[<b>%1$s</b>]]></string>
     <string name="time_location_detail_compat">Read time: %1$s at %2$s </string>
     <string name="latitude_read_detail_compat">Latitude read: %1$s</string>
     <string name="longitude_read_detail_compat">Longitude read: %1$s</string>
     <string name="altitude_read_detail_compat">Altitude read: %1$s</string>
     <string name="back_button_description" translatable="false">back_to_location_list</string>
     <string name="altitude_label">Altitude</string>
-    <string name="num_of_element">Number of element <![CDATA[<b> %1$d </b>]]> </string>
+    <string name="num_of_element">Number of element <![CDATA[<b>%1$d</b>]]> </string>
     <string name="num_of_element_compat">Number of elements %1$d</string>
-    <string name="start_background_service">Start background service</string>
+    <string name="start_background_service">Enable background service</string>
     <string name="running_service" translatable="false">start</string>
     <string name="service_not_running" translatable="false">stop</string>
-    <string name="starting_background_service">Background service started!</string>
-    <string name="stopping_background_service">Background service stopped!</string>
+    <string name="starting_background_service">Background service enabled!</string>
+    <string name="stopping_background_service">Background service disabled!</string>
     <string name="channel_name">Background Localizer Service</string>
     <string name="channel_description">Localizer notification about background service</string>
     <string name="app_description">Locations are being saved</string>
@@ -49,10 +49,11 @@
     <string name="noData">There are no data to show into the charts</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="max_num_stored">Maximum number of locations stored: <![CDATA[<b> %1$d </b>]]></string>
+    <string name="max_num_stored">Maximum number of locations stored: <![CDATA[<b>%1$d</b>]]></string>
     <string name="max_num_stored_comp">Maximum number of locations stored: %1$d</string>
     <string name="max_minute_label">Select the maximum age [min] of stored items</string>
     <string name="max_number_data">Max number of stored data: %1$d</string>
-    <string name="background_button_hint">Button to start/stop background location service</string>
+    <string name="background_button_hint">Button to enable/disable background location service</string>
     <string name="delete_warning">Click this button to erase all data stored</string>
+    <string name="no_index" translatable="false">-</string>
 </resources>
