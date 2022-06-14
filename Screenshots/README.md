@@ -1,0 +1,8 @@
+![Position Portrait](/Screenshots/PositionP.png)
+![History Portrait](/Screenshots/HistoryP.png)
+![Details Portrait](/Screenshots/DetailsP.png)
+![Graph Portrait](/Screenshots/GraphP.png)
+![Position Landscape](/Screenshots/PositionL.png)
+![History Landscape](/Screenshots/HistoryL.png)
+![Details Landscape](/Screenshots/DetailsL.png)
+![Graph Landscape](/Screenshots/GraphL.png)

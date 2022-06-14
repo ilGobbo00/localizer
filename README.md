@@ -1,6 +1,6 @@
 # Localizer
 
-App developped for Embedded systems programming for the course hosted at University of Padua. 
+App developped for Embedded systems programming for the course hosted at University of Padua. The main aim is reading, storing and displaying locations read every T seconds (with T>=1s). Locations need to be read and stored even if the UI isn't displayed (so foreground service is required). The app doesn't need to read and store locations after reboot but it needs to be restarted in a consistent state. 
 
 ## Installation
 
@@ -11,7 +11,7 @@ Android version target: API 29 (Android 10)
 ## Device requirements
 
 1. Google play services 
-2. Minimum Android version required: API 21 (Android 5.0)
+2. Minimum Android version required: API 21 (Android 5.0) (**Suggested version target**)
 3. 4.65'' minimum screen size (**Suggested 6.2''**)
 4. A working MAPS_API_KEY into local.proprieties (***MAPS_API_KEY=<api_key>***)
 
